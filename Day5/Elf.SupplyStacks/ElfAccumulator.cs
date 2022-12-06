@@ -43,7 +43,7 @@ internal ref struct ElfAccumulator
         }
     }
 
-    internal string GetTopOfStacks()
+    public string GetTopOfStacks()
     {
         StringBuilder builder = new();
         foreach (var stack in this.stacks)
