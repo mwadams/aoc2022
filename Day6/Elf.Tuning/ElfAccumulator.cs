@@ -22,24 +22,24 @@ internal ref struct ElfAccumulator
     private int FindDistincSequence(ReadOnlySpan<char> line, int requiredSequenceLength)
     {
         int index = 0;
-        while (index <= line.Length - requiredSequenceLength)
+        // index marks the start of a group of requiredSequenceLength characters
+        // (index + k) is the anchor character within that group that we are comparing to each subsequent character
+        // on this iteration.
+        for (int k = 0; k < requiredSequenceLength - 1; ++k)
         {
-            for (int k = 0; k < requiredSequenceLength - 1; ++k) // The number of characters in sequence
+            // This is the look-ahead loop to compare the anchor character at (index + k) with each subsequent character in the group;
+            // (this inner loop naturally decreases in length by 1 each time we move the anchor character in the group up by 1) 
+            for (int j = index + k + 1; j < index + requiredSequenceLength; ++j)
             {
-                for (int j = index + k + 1; j < index + requiredSequenceLength; ++j)
+                if (line[index + k] == line[j]) // Look for a duplicate pair
                 {
-                    if (line[index + k] == line[j])
-                    {
-                        index = index + k + 1; // skip ahead to the first of the duplicate pair
-                        k = -1; // reset k
-                        break;
-                    }
+                    index = index + k + 1; // skip ahead past the first of the duplicate pair
+                    k = -1; // reset k to start from the beginning of the new group (it will be incremented by the outer loop to start a 0)
+                    break;
                 }
             }
-
-            return index + requiredSequenceLength;
         }
-
-        return -1;
+        // If we got to the end of the 
+        return index + requiredSequenceLength;
     }
 }
