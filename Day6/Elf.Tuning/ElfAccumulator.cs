@@ -16,10 +16,10 @@ internal ref struct ElfAccumulator
 
     public void ProcessLine(string line)
     {
-        this.CharactersRead = FindDistincSequence(line.AsSpan(), this.requiredSequenceLength);
+        this.CharactersRead = FindDistinctSequence(line.AsSpan(), this.requiredSequenceLength);
     }
 
-    private int FindDistincSequence(ReadOnlySpan<char> line, int requiredSequenceLength)
+    private int FindDistinctSequence(ReadOnlySpan<char> line, int requiredSequenceLength)
     {
         // Initial check for line length mismatch
         if (line.Length < requiredSequenceLength)
