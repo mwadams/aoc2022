@@ -35,6 +35,12 @@ internal ref struct ElfAccumulator
                 {
                     index = index + k + 1; // skip ahead past the first of the duplicate pair
                     k = -1; // reset k to start from the beginning of the new group (it will be incremented by the outer loop to start a 0)
+
+                    if (index > line.Length - requiredSequenceLength)
+                    {
+                        return -1;
+                    }
+
                     break;
                 }
             }
