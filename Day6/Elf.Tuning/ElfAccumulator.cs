@@ -21,41 +21,50 @@ internal ref struct ElfAccumulator
 
     private int FindDistincSequence(ReadOnlySpan<char> line, int requiredSequenceLength)
     {
+        // Initial check for line length mismatch
         if (line.Length < requiredSequenceLength)
         {
             return -1;
         }
-        int index = 0;
-        // index marks the start of a group of requiredSequenceLength characters
-        // (index + k) is the anchor character within that group that we are comparing to each subsequent character
+
+        int startOfSequenceIndex = 0;
+        int indexOfAnchorInSequence = 0;
+        // startOfSequenceIndex marks the start of a group of requiredSequenceLength characters
+        // (startOfSequenceIndex + indexOfAnchorInSequence) is the anchor character within that group that we are comparing to each subsequent character
         // on this iteration.
         // We only need to iterate through (requiredSequenceLength - 1) as our anchor in the group, because we don't need to 
         // compare the last character to itself!
-        for (int k = 0; k < requiredSequenceLength - 1; ++k)
+
+        while (indexOfAnchorInSequence < requiredSequenceLength - 1)
         {
-            // This is the look-ahead loop to compare the anchor character at (index + k) with each subsequent character in the group;
+            // This is the look-ahead loop to compare the anchor character at (startOfSequenceIndex + indexOfAnchorInSequence) with each subsequent character in the group;
             // (this inner loop naturally decreases in length by 1 each time we move the anchor character in the group up by 1) 
-            for (int j = index + k + 1; j < index + requiredSequenceLength; ++j)
+            for (int lookAheadIndexInGroup = startOfSequenceIndex + indexOfAnchorInSequence + 1; lookAheadIndexInGroup < startOfSequenceIndex + requiredSequenceLength; ++lookAheadIndexInGroup)
             {
-                if (line[index + k] == line[j]) // Look for a duplicate pair
+                // Look for a duplicate pair
+                if (line[startOfSequenceIndex + indexOfAnchorInSequence] == line[lookAheadIndexInGroup])
                 {
                     // skip ahead past the first of the duplicate pair
-                    index = index + k + 1;
+                    startOfSequenceIndex += indexOfAnchorInSequence + 1;
 
                     // Check we haven't run out of line
-                    if (index > line.Length - requiredSequenceLength)
+                    if (startOfSequenceIndex > line.Length - requiredSequenceLength)
                     {
                         return -1;
                     }
 
                     // reset k to start from the beginning of the new group (it will be incremented by the outer loop to start a 0)
-                    k = -1;
+                    indexOfAnchorInSequence = -1;
 
                     break;
                 }
             }
+
+            // Move to the next anchor in the group
+            ++indexOfAnchorInSequence;
         }
+
         // If we got to the end of the group, we have found a non-duplicate set.
-        return index + requiredSequenceLength;
+        return startOfSequenceIndex + requiredSequenceLength;
     }
 }
