@@ -33,8 +33,10 @@ internal ref struct ElfAccumulator
             {
                 if (line[index + k] == line[j]) // Look for a duplicate pair
                 {
-                    index = index + k + 1; // skip ahead past the first of the duplicate pair
-                    k = -1; // reset k to start from the beginning of the new group (it will be incremented by the outer loop to start a 0)
+                    // skip ahead past the first of the duplicate pair
+                    index = index + k + 1;
+                    // reset k to start from the beginning of the new group (it will be incremented by the outer loop to start a 0)
+                    k = -1; 
 
                     if (index > line.Length - requiredSequenceLength)
                     {
@@ -45,7 +47,7 @@ internal ref struct ElfAccumulator
                 }
             }
         }
-        // If we got to the end of the 
+        // If we got to the end of the group, we have found a non-duplicate set.
         return index + requiredSequenceLength;
     }
 }
