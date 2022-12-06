@@ -53,7 +53,7 @@ internal ref struct ElfAccumulator
                         return -1;
                     }
 
-                    // reset k to start from the beginning of the new group (it will be incremented by the outer loop to start a 0)
+                    // reset the indexOfAnchorInSequence to start from the beginning of the new group (it will be incremented by the outer loop to start a 0)
                     indexOfAnchorInSequence = -1;
 
                     break;
