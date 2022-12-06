@@ -25,6 +25,8 @@ internal ref struct ElfAccumulator
         // index marks the start of a group of requiredSequenceLength characters
         // (index + k) is the anchor character within that group that we are comparing to each subsequent character
         // on this iteration.
+        // We only need to iterate through (requiredSequenceLength - 1) as our anchor in the group, because we don't need to 
+        // compare the last character to itself!
         for (int k = 0; k < requiredSequenceLength - 1; ++k)
         {
             // This is the look-ahead loop to compare the anchor character at (index + k) with each subsequent character in the group;
