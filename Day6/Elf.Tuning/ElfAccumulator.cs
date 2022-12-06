@@ -21,6 +21,10 @@ internal ref struct ElfAccumulator
 
     private int FindDistincSequence(ReadOnlySpan<char> line, int requiredSequenceLength)
     {
+        if (line.Length < requiredSequenceLength)
+        {
+            return -1;
+        }
         int index = 0;
         // index marks the start of a group of requiredSequenceLength characters
         // (index + k) is the anchor character within that group that we are comparing to each subsequent character
