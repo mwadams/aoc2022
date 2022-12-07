@@ -68,10 +68,6 @@ internal ref struct ElfAccumulator
         {
             this.EnterChildDirectory(commandSpan[3..].ToString());
         }
-        else if (commandSpan.StartsWith("ls"))
-        {
-            // Don't do anything
-        }
     }
 
     private void LeaveChildDirectory()
