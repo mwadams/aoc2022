@@ -4,9 +4,9 @@ using System;
 
 internal ref struct ElfAccumulator
 {
+    private readonly Stack<Directory> directoryStack;
+    private readonly List<int> totalSizes;
     private readonly int maxSize;
-    private Stack<Directory> directoryStack;
-    private List<int> totalSizes;
 
     public ElfAccumulator(int maxSize)
     {
@@ -66,7 +66,7 @@ internal ref struct ElfAccumulator
         }
         else if (commandSpan.StartsWith("cd "))
         {
-            this.EnterChildDirectory(commandSpan[3..].ToString());
+            this.EnterChildDirectory();
         }
     }
 
@@ -96,16 +96,16 @@ internal ref struct ElfAccumulator
 
     }
 
-    private readonly void EnterChildDirectory(string name)
+    private readonly void EnterChildDirectory()
     {
         Directory newChild;
         if (this.directoryStack.TryPeek(out Directory? result))
         {
-            newChild = result.GetOrAddChild(name);
+            newChild = result.AddChild();
         }
         else
         {
-            newChild = new(name);
+            newChild = new();
         }
 
         this.directoryStack.Push(newChild);

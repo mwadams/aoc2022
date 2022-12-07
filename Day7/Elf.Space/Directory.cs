@@ -2,33 +2,26 @@
 
 public class Directory
 {
-    private readonly Dictionary<string, Directory> children = new();
-    private readonly string name;
+    private readonly List<Directory> children = new();
     private int? totalSize;
     private int size = 0;
 
-    public Directory(string name)
+    public Directory()
     {
-        this.name = name;
     }
 
     // Memoize the total size
-    public int TotalSize => (this.totalSize ??= this.children.Sum(c => c.Value.TotalSize) + this.size);
+    public int TotalSize => (this.totalSize ??= this.children.Sum(c => c.TotalSize) + this.size);
     
     public void AddFile(int size)
     {
         this.size += size;
     }
 
-    public Directory GetOrAddChild(string name)
+    public Directory AddChild()
     {
-        if (this.children.TryGetValue(name,out Directory? value))
-        {
-            return value;
-        }
-
-        Directory result = new Directory(name);
-        this.children.Add(name, result);
+        Directory result = new Directory();
+        this.children.Add(result);
         return result;
     }
 }
