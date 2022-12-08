@@ -21,30 +21,35 @@ internal ref struct ElfAccumulator
 
     public int MaxScenicScore { get; private set; }
 
-    public void BuildMetrics()
+    public void BuildMetrics(bool scenic)
     {
-        this.BuildNorthAndWest();
-        this.BuildEastAndSouth();
-        this.CountResults();
+        this.BuildNorthAndWest(scenic);
+        this.BuildEastAndSouth(scenic);
+        this.CountResults(scenic);
     }
 
-    private void CountResults()
+    private void CountResults(bool scenic)
     {
         for (int y = 0; y < this.height; ++y)
         {
             for (int x = 0; x < this.width; ++x)
             {
-                if (this.IsVisible(x, y))
+                if (!scenic)
                 {
-                    this.VisibleCount++;
+                    if (this.IsVisible(x, y))
+                    {
+                        this.VisibleCount++;
+                    }
                 }
-
-                this.MaxScenicScore = Math.Max(this.MaxScenicScore, this.metrics[x, y].ScenicScore);
+                else
+                {
+                    this.MaxScenicScore = Math.Max(this.MaxScenicScore, this.metrics[x, y].ScenicScore);
+                }
             }
         }
     }
 
-    private void BuildNorthAndWest()
+    private void BuildNorthAndWest(bool scenic)
     {
         for (int y = 0; y < this.height; ++y)
         {
@@ -52,20 +57,34 @@ internal ref struct ElfAccumulator
             for (int x = 0; x < this.width; ++x)
             {
                 int value = line[x] - '0';
-                metrics[x, y] = new(value, GetMaxNorth(x, y, value), metrics[x, y].MaxEast, metrics[x, y].MaxSouth, GetMaxWest(x, y, value), GetNorthWestScenic(x, y, value));
+                if (!scenic)
+                {
+                    metrics[x, y] = new(value, GetMaxNorth(x, y, value), metrics[x, y].MaxEast, metrics[x, y].MaxSouth, GetMaxWest(x, y, value), 0);
+                }
+                else
+                {
+                    metrics[x, y] = new(value, 0, 0, 0, 0, GetNorthWestScenic(x, y, value));
+                }
             }
         }
     }
 
 
-    private void BuildEastAndSouth()
+    private void BuildEastAndSouth(bool scenic)
     {
         for (int y = this.height - 1; y >= 0; --y)
         {
             for (int x = this.width - 1; x >= 0; --x)
             {
                 int value = this.metrics[x, y].Value;
-                metrics[x, y] = new(value, metrics[x, y].MaxNorth, GetMaxEast(x, y, value), GetMaxSouth(x, y, value), metrics[x, y].MaxWest, GetSouthEastScenic(x, y, value) * metrics[x, y].ScenicScore);
+                if (!scenic)
+                {
+                    metrics[x, y] = new(value, metrics[x, y].MaxNorth, GetMaxEast(x, y, value), GetMaxSouth(x, y, value), metrics[x, y].MaxWest, 0);
+                }
+                else
+                {
+                    metrics[x, y] = new(value, 0, 0, 0, 0, GetSouthEastScenic(x, y, value) * metrics[x, y].ScenicScore);
+                }
             }
         }
     }

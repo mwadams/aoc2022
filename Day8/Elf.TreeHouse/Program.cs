@@ -1,5 +1,6 @@
 ﻿using Elf.TreeHouse;
 using System.CommandLine;
+using System.Diagnostics;
 
 var fileOption = new Option<FileInfo>(
     name: "--file",
@@ -17,8 +18,21 @@ return await rootCommand.InvokeAsync(args);
 
 static void ProcessElfFile(FileInfo file)
 {
-    ElfAccumulator accumulator = new(File.ReadAllLines(file.FullName));
-    accumulator.BuildMetrics();
-    Console.WriteLine($"The number of visible trees was {accumulator.VisibleCount}.");
+    ElfAccumulator accumulator = default;
+
+
+    var sw = Stopwatch.StartNew();
+    
+    string[] lines = File.ReadAllLines(file.FullName);
+    for (int i = 0; i < 1_000; ++i)
+    {
+        accumulator = new(lines);
+        accumulator.BuildMetrics(true);
+    }
+
+    sw.Stop();
+
+    Console.WriteLine($"The visible tree count was {accumulator.VisibleCount}.");
     Console.WriteLine($"The maximum scenic score was {accumulator.MaxScenicScore}.");
+    Console.WriteLine($"Time: {sw.ElapsedMilliseconds / 1_000.0}ms");
 }
