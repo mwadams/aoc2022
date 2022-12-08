@@ -1,5 +1,6 @@
 ﻿using Elf.Space;
 using System.CommandLine;
+using System.Diagnostics;
 
 var fileOption = new Option<FileInfo>(
     name: "--file",
@@ -17,15 +18,29 @@ return await rootCommand.InvokeAsync(args);
 
 static void ProcessElfFile(FileInfo file)
 {
-    ElfAccumulator accumulator = new(100_000);
+    int totalSize = 0;
+    int directorySize = 0;
 
-    foreach (var line in File.ReadLines(file.FullName))
+    var sw = Stopwatch.StartNew();
+
+    for (int i = 0; i < 10_000; ++i)
     {
-        accumulator.ProcessLine(line);
+        ElfAccumulator accumulator = new(100_000);
+
+        foreach (var line in File.ReadLines(file.FullName))
+        {
+            accumulator.ProcessLine(line);
+        }
+
+        accumulator.Finish();
+
+        totalSize = accumulator.TotalAtMostMaxSize;
+        directorySize = accumulator.GetDirectorySizeToFreeUp(30_000_000, 70_000_000);
     }
 
-    accumulator.Finish();
+    sw.Stop();
 
-    Console.WriteLine($"Total at most MaxSize: {accumulator.TotalAtMostMaxSize}");
-    Console.WriteLine($"Directory to delete: {accumulator.GetDirectorySizeToFreeUp(30_000_000, 70_000_000)}");
+    Console.WriteLine($"Total at most MaxSize: {totalSize}");
+    Console.WriteLine($"Directory to delete: {directorySize}");
+    Console.WriteLine($"Total time: {sw.ElapsedMilliseconds / 10_000.0}ns");
 }

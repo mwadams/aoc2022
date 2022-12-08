@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33103.201
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elf.TreeHouse", "Elf.TreeHouse.csproj", "{464B4FA0-B9D8-48ED-9311-DBFCE63E5D48}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{464B4FA0-B9D8-48ED-9311-DBFCE63E5D48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{464B4FA0-B9D8-48ED-9311-DBFCE63E5D48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{464B4FA0-B9D8-48ED-9311-DBFCE63E5D48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{464B4FA0-B9D8-48ED-9311-DBFCE63E5D48}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6411A25C-3D97-4619-BE35-B9FEBC6C3373}
+	EndGlobalSection
+EndGlobal
