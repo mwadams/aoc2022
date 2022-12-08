@@ -16,6 +16,8 @@ rootCommand.SetHandler(
 
 return await rootCommand.InvokeAsync(args);
 
+const double Iterations = 10_000.0;
+
 static void ProcessElfFile(FileInfo file)
 {
     ElfAccumulator accumulator = default;
@@ -25,15 +27,32 @@ static void ProcessElfFile(FileInfo file)
     
     string[] lines = File.ReadAllLines(file.FullName);
     
-    for (int i = 0; i < 1_000; ++i)
+    for (int i = 0; i < Iterations; ++i)
     {
         accumulator = new(lines);
-        accumulator.BuildMetrics(true);
+        accumulator.BuildMetrics();
     }
 
     sw.Stop();
 
-    Console.WriteLine($"The visible tree count was {accumulator.VisibleCount}.");
-    Console.WriteLine($"The maximum scenic score was {accumulator.MaxScenicScore}.");
-    Console.WriteLine($"Time: {sw.ElapsedMilliseconds / 1_000.0}ms");
+    Console.WriteLine($"{accumulator.Result}.");
+    Console.WriteLine($"Time: {sw.ElapsedMilliseconds / Iterations}ms");
+
+
+    ElfAccumulatorScenic accumulatorScenic = default;
+
+    var sw2 = Stopwatch.StartNew();
+
+    string[] lines2 = File.ReadAllLines(file.FullName);
+
+    for (int i = 0; i < Iterations; ++i)
+    {
+        accumulatorScenic = new(lines2);
+        accumulatorScenic.BuildMetrics();
+    }
+
+    sw2.Stop();
+
+    Console.WriteLine($"{accumulatorScenic.Result}.");
+    Console.WriteLine($"Time: {sw2.ElapsedMilliseconds / Iterations}ms");
 }
