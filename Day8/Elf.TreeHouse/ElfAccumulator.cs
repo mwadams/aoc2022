@@ -25,28 +25,6 @@ internal ref struct ElfAccumulator
     {
         this.BuildNorthAndWest(scenic);
         this.BuildEastAndSouth(scenic);
-        this.CountResults(scenic);
-    }
-
-    private void CountResults(bool scenic)
-    {
-        for (int y = 0; y < this.height; ++y)
-        {
-            for (int x = 0; x < this.width; ++x)
-            {
-                if (!scenic)
-                {
-                    if (this.IsVisible(x, y))
-                    {
-                        this.VisibleCount++;
-                    }
-                }
-                else
-                {
-                    this.MaxScenicScore = Math.Max(this.MaxScenicScore, this.metrics[x, y].ScenicScore);
-                }
-            }
-        }
     }
 
     private void BuildNorthAndWest(bool scenic)
@@ -85,7 +63,24 @@ internal ref struct ElfAccumulator
                 {
                     metrics[x, y] = new(value, 0, 0, 0, 0, GetSouthEastScenic(x, y, value) * metrics[x, y].ScenicScore);
                 }
+
+                BuildResult(scenic, y, x);
             }
+        }
+    }
+
+    private void BuildResult(bool scenic, int y, int x)
+    {
+        if (!scenic)
+        {
+            if (this.IsVisible(x, y))
+            {
+                this.VisibleCount++;
+            }
+        }
+        else
+        {
+            this.MaxScenicScore = Math.Max(this.MaxScenicScore, this.metrics[x, y].ScenicScore);
         }
     }
 

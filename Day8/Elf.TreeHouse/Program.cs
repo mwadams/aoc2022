@@ -24,6 +24,7 @@ static void ProcessElfFile(FileInfo file)
     var sw = Stopwatch.StartNew();
     
     string[] lines = File.ReadAllLines(file.FullName);
+    
     for (int i = 0; i < 1_000; ++i)
     {
         accumulator = new(lines);
