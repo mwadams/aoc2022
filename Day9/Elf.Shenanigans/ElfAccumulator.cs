@@ -1,6 +1,7 @@
 ﻿namespace Elf.Shenanigans;
 
 using System;
+using System.Reflection;
 
 internal ref struct ElfAccumulator
 {
@@ -85,6 +86,8 @@ internal ref struct ElfAccumulator
         {
             UpdateTail(i);
         }
+
+        tailPositions.Add(tailPosition[^1]);
     }
 
     private void UpdateTail(int index)
@@ -110,11 +113,6 @@ internal ref struct ElfAccumulator
         {
             tailPosition[index].Y--;
             UpdateXAfterY(index, compareTo);
-        }
-
-        if (index == tailPosition.Length - 1)
-        {
-            tailPositions.Add(tailPosition[index]);
         }
     }
 

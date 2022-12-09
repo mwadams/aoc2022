@@ -1,5 +1,6 @@
 ﻿using Elf.Shenanigans;
 using System.CommandLine;
+using System.Diagnostics;
 
 var fileOption = new Option<FileInfo>(
     name: "--file",
@@ -15,13 +16,39 @@ rootCommand.SetHandler(
 
 return await rootCommand.InvokeAsync(args);
 
+const double Iterations = 5_000.0;
+
 static void ProcessElfFile(FileInfo file)
 {
-    ElfAccumulator accumulator = new(1, 9);
-    foreach (var line in File.ReadLines(file.FullName))
+    ElfAccumulator accumulator = default;
+
+    var sw = Stopwatch.StartNew();
+    for (int i = 0; i < Iterations; ++i)
     {
-        accumulator.ProcessLine(line);
+        accumulator = new(1, 1);
+        foreach (var line in File.ReadLines(file.FullName))
+        {
+            accumulator.ProcessLine(line);
+        }
+
     }
+    sw.Stop();
 
     Console.WriteLine(accumulator.Visited);
+    Console.WriteLine($"{sw.ElapsedMilliseconds / Iterations}ms");
+
+    sw = Stopwatch.StartNew();
+    for (int i = 0; i < Iterations; ++i)
+    {
+        accumulator = new(1, 9);
+        foreach (var line in File.ReadLines(file.FullName))
+        {
+            accumulator.ProcessLine(line);
+        }
+
+    }
+    sw.Stop();
+
+    Console.WriteLine(accumulator.Visited);
+    Console.WriteLine($"{sw.ElapsedMilliseconds / Iterations}ms");
 }
