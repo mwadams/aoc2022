@@ -17,7 +17,7 @@ return await rootCommand.InvokeAsync(args);
 
 static void ProcessElfFile(FileInfo file)
 {
-    ElfAccumulator accumulator = new(1);
+    ElfAccumulator accumulator = new(1, 9);
     foreach (var line in File.ReadLines(file.FullName))
     {
         accumulator.ProcessLine(line);

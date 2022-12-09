@@ -5,16 +5,16 @@ using System;
 internal ref struct ElfAccumulator
 {
     (int X, int Y) headPosition;
-    (int X, int Y) tailPosition;
+    (int X, int Y)[] tailPosition;
 
     HashSet<(int, int)> tailPositions;
     private readonly int maxDistance;
 
-    public ElfAccumulator(int maxDistance)
+    public ElfAccumulator(int maxDistance, int knots)
     {
         tailPositions = new();
         headPosition = (0, 0);
-        tailPosition = (0, 0);
+        tailPosition = new(int X, int Y)[knots];
         tailPositions.Add((0, 0));
         this.maxDistance = maxDistance;
     }
@@ -47,8 +47,8 @@ internal ref struct ElfAccumulator
     {
         for(int i = 0; i < distance; ++i)
         {
-            headPosition.X++;;
-            UpdateTail();
+            headPosition.X++;
+            UpdateTails();
         }
     }
 
@@ -57,7 +57,7 @@ internal ref struct ElfAccumulator
         for (int i = 0; i < distance; ++i)
         {
             headPosition.X--;
-            UpdateTail();
+            UpdateTails();
         }
     }
 
@@ -66,7 +66,7 @@ internal ref struct ElfAccumulator
         for (int i = 0; i < distance; ++i)
         {
             headPosition.Y--;
-            UpdateTail();
+            UpdateTails();
         }
     }
 
@@ -75,61 +75,74 @@ internal ref struct ElfAccumulator
         for (int i = 0; i < distance; ++i)
         {
             headPosition.Y++;
-            UpdateTail();
+            UpdateTails();
         }
     }
 
-    private void UpdateTail()
+    private void UpdateTails()
     {
-        if (headPosition.X > tailPosition.X + this.maxDistance)
+        for(int i = 0; i < tailPosition.Length; ++i)
         {
-            tailPosition.X++;
-            if (headPosition.Y > tailPosition.Y)
+            UpdateTail(i);
+        }
+    }
+
+    private void UpdateTail(int index)
+    {
+        (int X, int Y) compareTo = index > 0 ? tailPosition[index - 1] : headPosition;
+
+        if (compareTo.X > tailPosition[index].X + this.maxDistance)
+        {
+            tailPosition[index].X++;
+            if (compareTo.Y > tailPosition[index].Y)
             {
-                tailPosition.Y++;
+                tailPosition[index].Y++;
             }
-            else if (headPosition.Y < tailPosition.Y)
+            else if (compareTo.Y < tailPosition[index].Y)
             {
-                tailPosition.Y--;
+                tailPosition[index].Y--;
             }
         }
-        else if (headPosition.X < tailPosition.X - this.maxDistance)
+        else if (compareTo.X < tailPosition[index].X - this.maxDistance)
         {
-            tailPosition.X--;
-            if (headPosition.Y > tailPosition.Y)
+            tailPosition[index].X--;
+            if (compareTo.Y > tailPosition[index].Y)
             {
-                tailPosition.Y++;
+                tailPosition[index].Y++;
             }
-            else if (headPosition.Y < tailPosition.Y)
+            else if (compareTo.Y < tailPosition[index].Y)
             {
-                tailPosition.Y--;
+                tailPosition[index].Y--;
             }
         }
-        else if (headPosition.Y > tailPosition.Y + this.maxDistance)
+        else if (compareTo.Y > tailPosition[index].Y + this.maxDistance)
         {
-            tailPosition.Y++;
-            if (headPosition.X > tailPosition.X)
+            tailPosition[index].Y++;
+            if (compareTo.X > tailPosition[index].X)
             {
-                tailPosition.X++;
+                tailPosition[index].X++;
             }
-            else if (headPosition.X < tailPosition.X)
+            else if (compareTo.X < tailPosition[index].X)
             {
-                tailPosition.X--;
+                tailPosition[index].X--;
             }
         }
-        else if (headPosition.Y < tailPosition.Y - this.maxDistance)
+        else if (compareTo.Y < tailPosition[index].Y - this.maxDistance)
         {
-            tailPosition.Y--;
-            if (headPosition.X > tailPosition.X)
+            tailPosition[index].Y--;
+            if (compareTo.X > tailPosition[index].X)
             {
-                tailPosition.X++;
+                tailPosition[index].X++;
             }
-            else if (headPosition.X < tailPosition.X)
+            else if (compareTo.X < tailPosition[index].X)
             {
-                tailPosition.X--;
+                tailPosition[index].X--;
             }
         }
 
-        this.tailPositions.Add(this.tailPosition);
+        if (index == tailPosition.Length - 1)
+        {
+            tailPositions.Add(tailPosition[index]);
+        }
     }
 }
