@@ -94,55 +94,51 @@ internal ref struct ElfAccumulator
         if (compareTo.X > tailPosition[index].X + this.maxDistance)
         {
             tailPosition[index].X++;
-            if (compareTo.Y > tailPosition[index].Y)
-            {
-                tailPosition[index].Y++;
-            }
-            else if (compareTo.Y < tailPosition[index].Y)
-            {
-                tailPosition[index].Y--;
-            }
+            UpdateYAfterX(index, compareTo);
         }
         else if (compareTo.X < tailPosition[index].X - this.maxDistance)
         {
             tailPosition[index].X--;
-            if (compareTo.Y > tailPosition[index].Y)
-            {
-                tailPosition[index].Y++;
-            }
-            else if (compareTo.Y < tailPosition[index].Y)
-            {
-                tailPosition[index].Y--;
-            }
+            UpdateYAfterX(index, compareTo);
         }
         else if (compareTo.Y > tailPosition[index].Y + this.maxDistance)
         {
             tailPosition[index].Y++;
-            if (compareTo.X > tailPosition[index].X)
-            {
-                tailPosition[index].X++;
-            }
-            else if (compareTo.X < tailPosition[index].X)
-            {
-                tailPosition[index].X--;
-            }
+            UpdateXAfterY(index, compareTo);
         }
         else if (compareTo.Y < tailPosition[index].Y - this.maxDistance)
         {
             tailPosition[index].Y--;
-            if (compareTo.X > tailPosition[index].X)
-            {
-                tailPosition[index].X++;
-            }
-            else if (compareTo.X < tailPosition[index].X)
-            {
-                tailPosition[index].X--;
-            }
+            UpdateXAfterY(index, compareTo);
         }
 
         if (index == tailPosition.Length - 1)
         {
             tailPositions.Add(tailPosition[index]);
+        }
+    }
+
+    private void UpdateYAfterX(int index, (int X, int Y) compareTo)
+    {
+        if (compareTo.Y > tailPosition[index].Y)
+        {
+            tailPosition[index].Y++;
+        }
+        else if (compareTo.Y < tailPosition[index].Y)
+        {
+            tailPosition[index].Y--;
+        }
+    }
+
+    private void UpdateXAfterY(int index, (int X, int Y) compareTo)
+    {
+        if (compareTo.X > tailPosition[index].X)
+        {
+            tailPosition[index].X++;
+        }
+        else if (compareTo.X < tailPosition[index].X)
+        {
+            tailPosition[index].X--;
         }
     }
 }
