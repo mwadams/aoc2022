@@ -4,17 +4,19 @@ internal ref struct ElfAccumulatorCrt
 {
     private readonly int crtWidth;
     private readonly int crtHeight;
+    private readonly int offset;
     private readonly char[,] screenBuffer;
 
     private int beamPositionX = 0;
     private int beamPositionY = 0;
     private int xRegister = 1;
 
-    public ElfAccumulatorCrt(int crtWidth, int crtHeight)
+    public ElfAccumulatorCrt(int crtWidth, int crtHeight, int offset)
     {
         this.crtWidth = crtWidth;
         this.crtHeight = crtHeight;
-        this.screenBuffer = new char[crtWidth, crtHeight];        
+        this.offset = offset;
+        this.screenBuffer = new char[crtWidth, crtHeight];
     }
 
 
@@ -42,7 +44,13 @@ internal ref struct ElfAccumulatorCrt
             Console.WriteLine();
             for(int x = 0; x < this.crtWidth; ++x)
             {
-                Console.Write(screenBuffer[x, y]);
+                int offsetPosition = x + this.offset;
+                if (offsetPosition >= this.crtWidth)
+                {
+                    offsetPosition -= this.crtWidth;
+                }
+
+                Console.Write(screenBuffer[offsetPosition, y]);
             }
         }
     }

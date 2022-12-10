@@ -1,5 +1,6 @@
 ﻿using Elf.Malarky;
 using System.CommandLine;
+using System.Diagnostics;
 
 var fileOption = new Option<FileInfo>(
     name: "--file",
@@ -17,12 +18,51 @@ return await rootCommand.InvokeAsync(args);
 
 static void ProcessElfFile(FileInfo file)
 {
-    ElfAccumulatorCrt accumulator = new(40, 6);
+    int offset = 0;
+    int frameCounter = 0;
+    long totalTicks = 0;
+    double averageFrameTimeMs = 0;
 
-    foreach (var line in File.ReadLines(file.FullName))
+    while (true)
     {
-        accumulator.ProcessLine(line);
-    }
+        var sw = Stopwatch.StartNew();
+        ElfAccumulatorCrt accumulator = new(40, 6, offset);
 
-    accumulator.DrawScreen();
+        foreach (var line in File.ReadLines(file.FullName))
+        {
+            accumulator.ProcessLine(line);
+        }
+
+        accumulator.DrawScreen();
+        
+        sw.Stop();
+        
+        totalTicks += sw.ElapsedTicks;
+
+        frameCounter++;
+        if (frameCounter % 10 == 0)
+        {
+            if (offset < 39)
+            {
+                offset++;
+            }
+            else
+            {
+                offset = 0;
+            }
+        }
+
+        if (frameCounter % 100 == 0)
+        {
+            averageFrameTimeMs = totalTicks / (100 * 10_000.0);
+            totalTicks = 0;
+        }
+
+        Console.WriteLine();
+        Console.WriteLine();
+        Console.WriteLine($"FPS: {Math.Round(1000.0 / averageFrameTimeMs)}");
+
+        Console.CursorTop = 1;
+        Console.CursorTop = 0;
+    }
 }
