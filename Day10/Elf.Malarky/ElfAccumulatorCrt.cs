@@ -61,15 +61,12 @@ internal ref struct ElfAccumulatorCrt
 
     private void HandleCycle()
     {
-        HandleCrt();
+        this.HandleSprite();
+        this.MoveBeam();
     }
 
-    private void HandleCrt()
+    private void MoveBeam()
     {
-        // We handle the sprite at the beginning so we don't
-        // have to deal with the bootstrapping case
-        this.HandleSprite();
-
         if (this.beamPositionX == this.crtWidth - 1)
         {
             this.beamPositionX = 0;
@@ -86,7 +83,6 @@ internal ref struct ElfAccumulatorCrt
         {
             this.beamPositionX++;
         }
-
     }
 
     private void HandleSprite()
