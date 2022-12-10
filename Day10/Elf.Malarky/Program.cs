@@ -28,6 +28,7 @@ static void ProcessElfFile(FileInfo file)
     Console.CursorVisible = false;
 
     string[] program = File.ReadAllLines(file.FullName);
+    int elapsedSinceTarget = 0;
 
     while (true)
     {
@@ -46,15 +47,9 @@ static void ProcessElfFile(FileInfo file)
         totalTicks += sw.ElapsedTicks;
 
         frameCounter++;
+        elapsedSinceTarget++;
 
-        if (frameCounter % 1000 == 0)
-        {
-            averageFrameTimeMs = totalTicks / (1000 * 10_000.0);
-            totalTicks = 0;
-            targetFrameCount = (int)Math.Round((100.0 / averageFrameTimeMs));
-        }
-
-        if (frameCounter % targetFrameCount == 0)
+        if (elapsedSinceTarget >= targetFrameCount)
         {
             if (offset < 39)
             {
@@ -64,8 +59,16 @@ static void ProcessElfFile(FileInfo file)
             {
                 offset = 0;
             }
+
+            elapsedSinceTarget = 0;
         }
 
+        if (frameCounter % 10 == 0)
+        {
+            averageFrameTimeMs = totalTicks / (10 * 10_000.0);
+            totalTicks = 0;
+            targetFrameCount = (int)Math.Round((100.0 / averageFrameTimeMs));
+        }
 
         Console.WriteLine();
         Console.WriteLine();
