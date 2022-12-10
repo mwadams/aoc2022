@@ -21,7 +21,10 @@ static void ProcessElfFile(FileInfo file)
     int offset = 0;
     int frameCounter = 0;
     long totalTicks = 0;
-    double averageFrameTimeMs = 0;
+    double averageFrameTimeMs = 10;
+    int targetFrameCount = (int)Math.Round((100.0 / averageFrameTimeMs));
+
+    Console.CursorVisible = false;
 
     while (true)
     {
@@ -40,7 +43,15 @@ static void ProcessElfFile(FileInfo file)
         totalTicks += sw.ElapsedTicks;
 
         frameCounter++;
-        if (frameCounter % 10 == 0)
+
+        if (frameCounter % 100 == 0)
+        {
+            averageFrameTimeMs = totalTicks / (100 * 10_000.0);
+            totalTicks = 0;
+            targetFrameCount = (int)Math.Round((100.0 / averageFrameTimeMs));
+        }
+
+        if (frameCounter % targetFrameCount == 0)
         {
             if (offset < 39)
             {
@@ -52,11 +63,6 @@ static void ProcessElfFile(FileInfo file)
             }
         }
 
-        if (frameCounter % 100 == 0)
-        {
-            averageFrameTimeMs = totalTicks / (100 * 10_000.0);
-            totalTicks = 0;
-        }
 
         Console.WriteLine();
         Console.WriteLine();
