@@ -66,7 +66,7 @@ static void ProcessElfFile(FileInfo file)
 
         Console.WriteLine();
         Console.WriteLine();
-        Console.WriteLine($"FPS: {Math.Round(1000.0 / averageFrameTimeMs)}");
+        Console.WriteLine($"FPS: {Math.Round(1000.0 / averageFrameTimeMs)}    ");
 
         Console.CursorTop = 1;
         Console.CursorTop = 0;
