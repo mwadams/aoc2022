@@ -17,12 +17,12 @@ return await rootCommand.InvokeAsync(args);
 
 static void ProcessElfFile(FileInfo file)
 {
-    ElfAccumulator accumulator = new(20, 40);
+    ElfAccumulatorCrt accumulator = new(40, 6);
 
     foreach (var line in File.ReadLines(file.FullName))
     {
         accumulator.ProcessLine(line);
     }
 
-    Console.WriteLine($"{accumulator.AccumulatedSignalStrength}");
+    accumulator.DrawScreen();
 }
