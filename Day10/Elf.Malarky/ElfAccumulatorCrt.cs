@@ -37,7 +37,7 @@ internal ref struct ElfAccumulatorCrt
         }
     }
 
-    public void DrawScreen()
+    public void DrawScreen(bool blank)
     {
         for(int y = 0; y < this.crtHeight; ++y)
         {
@@ -50,7 +50,14 @@ internal ref struct ElfAccumulatorCrt
                     offsetPosition -= this.crtWidth;
                 }
 
-                Console.Write(screenBuffer[offsetPosition + (y * this.crtWidth)]);
+                if (blank)
+                {
+                    Console.Write(' ');
+                }
+                else
+                {
+                    Console.Write(screenBuffer[offsetPosition + (y * this.crtWidth)]);
+                }
             }
         }
     }

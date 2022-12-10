@@ -24,11 +24,13 @@ static void ProcessElfFile(FileInfo file)
     double averageFrameTimeMs = 6.25;
     int targetFrameCount = (int)Math.Round((100.0 / averageFrameTimeMs));
     Span<char> screenBuffer = stackalloc char[40 * 6];
+    double speedFPS = 10.0;
 
     Console.CursorVisible = false;
 
     string[] program = File.ReadAllLines(file.FullName);
     int elapsedSinceTarget = 0;
+    bool blank = true;
 
     while (true)
     {
@@ -40,7 +42,7 @@ static void ProcessElfFile(FileInfo file)
             accumulator.ProcessLine(line);
         }
 
-        accumulator.DrawScreen();
+        accumulator.DrawScreen(blank);
         
         sw.Stop();
         
@@ -63,11 +65,12 @@ static void ProcessElfFile(FileInfo file)
             elapsedSinceTarget = 0;
         }
 
-        if (frameCounter % 10 == 0)
+        if (frameCounter % 50 == 0)
         {
-            averageFrameTimeMs = totalTicks / (10 * 10_000.0);
+            averageFrameTimeMs = totalTicks / (50 * 10_000.0);
             totalTicks = 0;
-            targetFrameCount = (int)Math.Round((100.0 / averageFrameTimeMs));
+            targetFrameCount = (int)Math.Round((1000.0/speedFPS) / averageFrameTimeMs);
+            blank = false;
         }
 
         Console.WriteLine();
