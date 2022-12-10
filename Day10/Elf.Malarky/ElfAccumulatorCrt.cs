@@ -5,18 +5,18 @@ internal ref struct ElfAccumulatorCrt
     private readonly int crtWidth;
     private readonly int crtHeight;
     private readonly int offset;
-    private readonly char[,] screenBuffer;
+    private Span<char> screenBuffer;
 
     private int beamPositionX = 0;
     private int beamPositionY = 0;
     private int xRegister = 1;
 
-    public ElfAccumulatorCrt(int crtWidth, int crtHeight, int offset)
+    public ElfAccumulatorCrt(Span<char> screenBuffer, int crtWidth, int crtHeight, int offset)
     {
         this.crtWidth = crtWidth;
         this.crtHeight = crtHeight;
         this.offset = offset;
-        this.screenBuffer = new char[crtWidth, crtHeight];
+        this.screenBuffer = screenBuffer;
     }
 
 
@@ -50,7 +50,7 @@ internal ref struct ElfAccumulatorCrt
                     offsetPosition -= this.crtWidth;
                 }
 
-                Console.Write(screenBuffer[offsetPosition, y]);
+                Console.Write(screenBuffer[offsetPosition + (y * this.crtWidth)]);
             }
         }
     }
@@ -98,11 +98,11 @@ internal ref struct ElfAccumulatorCrt
         if (this.beamPositionX >= (this.xRegister - 1) &&
             this.beamPositionX <= this.xRegister + 1)
         {
-            this.screenBuffer[this.beamPositionX, this.beamPositionY] = '#';
+            this.screenBuffer[this.beamPositionX + (this.beamPositionY * this.crtWidth)] = '#';
         }
         else
         {
-            this.screenBuffer[this.beamPositionX, this.beamPositionY] = '.';
+            this.screenBuffer[this.beamPositionX + (this.beamPositionY * this.crtWidth)] = '.';
         }
     }
 }

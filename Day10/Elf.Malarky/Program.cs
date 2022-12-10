@@ -21,17 +21,20 @@ static void ProcessElfFile(FileInfo file)
     int offset = 0;
     int frameCounter = 0;
     long totalTicks = 0;
-    double averageFrameTimeMs = 10;
+    double averageFrameTimeMs = 6.25;
     int targetFrameCount = (int)Math.Round((100.0 / averageFrameTimeMs));
+    Span<char> screenBuffer = stackalloc char[40 * 6];
 
     Console.CursorVisible = false;
+
+    string[] program = File.ReadAllLines(file.FullName);
 
     while (true)
     {
         var sw = Stopwatch.StartNew();
-        ElfAccumulatorCrt accumulator = new(40, 6, offset);
+        ElfAccumulatorCrt accumulator = new(screenBuffer, 40, 6, offset);
 
-        foreach (var line in File.ReadLines(file.FullName))
+        foreach (var line in program)
         {
             accumulator.ProcessLine(line);
         }
@@ -44,9 +47,9 @@ static void ProcessElfFile(FileInfo file)
 
         frameCounter++;
 
-        if (frameCounter % 100 == 0)
+        if (frameCounter % 1000 == 0)
         {
-            averageFrameTimeMs = totalTicks / (100 * 10_000.0);
+            averageFrameTimeMs = totalTicks / (1000 * 10_000.0);
             totalTicks = 0;
             targetFrameCount = (int)Math.Round((100.0 / averageFrameTimeMs));
         }
