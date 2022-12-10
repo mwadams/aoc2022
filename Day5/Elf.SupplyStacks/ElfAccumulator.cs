@@ -35,7 +35,7 @@ internal ref struct ElfAccumulator
                 HandleLoading(line);
                 break;
             case State.WaitingForInstructions:
-                HandlWaitingForInstructions(line);
+                HandleWaitingForInstructions(line);
                 break;
             case State.Moving:
                 HandleMoving(line);
@@ -100,7 +100,7 @@ internal ref struct ElfAccumulator
         this.stacks[to - 1].Push(this.stacks[from - 1].Pop(numberToMove));
     }
 
-    private void HandlWaitingForInstructions(string line)
+    private void HandleWaitingForInstructions(string line)
     {
         if (string.IsNullOrEmpty(line))
         {
