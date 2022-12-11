@@ -1,6 +1,5 @@
 ﻿using Elf.Monkeys;
 using System.CommandLine;
-using System.Diagnostics;
 
 var fileOption = new Option<FileInfo>(
     name: "--file",
