@@ -15,20 +15,11 @@ internal ref struct ElfAccumulator
 
     public ulong MonkeyBusiness { get; private set; }
 
-    public void Play(int rounds, int topN, bool part1)
+    public void Play(int rounds, int topN, bool isPart1)
     {
         List<Monkey> monkeys = this.ParseMonkeys();
 
-        Func<ulong, ulong> applyRelief;
-        if (part1)
-        {
-            applyRelief = worry => worry / 3;
-        }
-        else
-        {
-            ulong lowestCommonMultiple = part1 ? 0 : CalculateLowestCommonMultiple(monkeys);
-            applyRelief = worry => worry % lowestCommonMultiple;
-        }
+        Func<ulong, ulong> applyRelief = GetReliefFunction(isPart1, monkeys);
 
         Span<int> inspectionCount = stackalloc int[monkeys.Count];
 
@@ -46,7 +37,23 @@ internal ref struct ElfAccumulator
         }
     }
 
-    private ulong CalculateLowestCommonMultiple(List<Monkey> monkeys)
+    private static Func<ulong, ulong> GetReliefFunction(bool part1, List<Monkey> monkeys)
+    {
+        Func<ulong, ulong> applyRelief;
+        if (part1)
+        {
+            applyRelief = worry => worry / 3;
+        }
+        else
+        {
+            ulong lowestCommonMultiple = part1 ? 0 : CalculateLowestCommonMultiple(monkeys);
+            applyRelief = worry => worry % lowestCommonMultiple;
+        }
+
+        return applyRelief;
+    }
+
+    private static ulong CalculateLowestCommonMultiple(List<Monkey> monkeys)
     {
         ulong result = 1;
         foreach (var monkey in monkeys)
