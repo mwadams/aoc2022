@@ -45,7 +45,7 @@ internal ref struct ElfAccumulator
         }
         else
         {
-            ulong lowestCommonMultiple = part1 ? 0 : CalculateLowestCommonMultiple(monkeys);
+            ulong lowestCommonMultiple = CalculateLowestCommonMultiple(monkeys);
             applyRelief = worry => worry % lowestCommonMultiple;
         }
 
