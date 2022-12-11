@@ -2,9 +2,9 @@
 
 using System.Numerics;
 
-internal record struct Monkey(List<BigInteger> Items, Func<BigInteger, BigInteger> Operation, Predicate<BigInteger> Test, BigInteger TestValue, int TrueTarget, int FalseTarget)
+internal record struct Monkey(List<ulong> Items, Func<ulong, ulong> Operation, Predicate<ulong> Test, ulong TestValue, int TrueTarget, int FalseTarget)
 {
-    internal void AddItem(BigInteger worryLevel)
+    internal void AddItem(ulong worryLevel)
     {
         this.Items.Add(worryLevel);
     }

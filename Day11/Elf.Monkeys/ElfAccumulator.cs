@@ -13,20 +13,20 @@ internal ref struct ElfAccumulator
         this.instructions = instructions;
     }
 
-    public BigInteger MonkeyBusiness { get; private set; }
+    public ulong MonkeyBusiness { get; private set; }
 
     public void Play(int rounds, int topN, bool part1)
     {
         List<Monkey> monkeys = this.ParseMonkeys();
 
-        Func<BigInteger, BigInteger> applyRelief;
+        Func<ulong, ulong> applyRelief;
         if (part1)
         {
             applyRelief = worry => worry / 3;
         }
         else
         {
-            BigInteger lowestCommonMultiple = part1 ? 0 : CalculateLowestCommonMultiple(monkeys);
+            ulong lowestCommonMultiple = part1 ? 0 : CalculateLowestCommonMultiple(monkeys);
             applyRelief = worry => worry % lowestCommonMultiple;
         }
 
@@ -42,13 +42,13 @@ internal ref struct ElfAccumulator
 
         for (int i = 0; i < topN; ++i)
         {
-            this.MonkeyBusiness *= inspectionCount[^(i + 1)];
+            this.MonkeyBusiness *= (ulong)inspectionCount[^(i + 1)];
         }
     }
 
-    private BigInteger CalculateLowestCommonMultiple(List<Monkey> monkeys)
+    private ulong CalculateLowestCommonMultiple(List<Monkey> monkeys)
     {
-        BigInteger result = 1;
+        ulong result = 1;
         foreach (var monkey in monkeys)
         {
             result = result * monkey.TestValue;
@@ -57,16 +57,16 @@ internal ref struct ElfAccumulator
         return result;
     }
 
-    private static void PlayRound(List<Monkey> monkeys, Span<int> inspectionCount, Func<BigInteger, BigInteger> applyRelief)
+    private static void PlayRound(List<Monkey> monkeys, Span<int> inspectionCount, Func<ulong, ulong> applyRelief)
     {
         int monkeyIndex = 0;
         foreach (Monkey monkey in monkeys)
         {
-            foreach (BigInteger item in monkey.Items)
+            foreach (ulong item in monkey.Items)
             {
                 inspectionCount[monkeyIndex]++;
 
-                BigInteger worryLevel = monkey.Operation(item);
+                ulong worryLevel = monkey.Operation(item);
 
                 worryLevel = applyRelief(worryLevel);
 
@@ -93,7 +93,7 @@ internal ref struct ElfAccumulator
         // Blocks of 7 for each monkey
         for (int i = 0; i < this.instructions.Length; i += 7)
         {
-            BigInteger testValue = ParseTestValue(this.instructions[i + 3].AsSpan());
+            ulong testValue = ParseTestValue(this.instructions[i + 3].AsSpan());
 
             monkeys.Add(new(
                 ParseItems(this.instructions[i + 1].AsSpan()),
@@ -117,12 +117,12 @@ internal ref struct ElfAccumulator
         return int.Parse(line[(line.LastIndexOf(' ') + 1)..]);
     }
 
-    private static BigInteger ParseTestValue(ReadOnlySpan<char> line)
+    private static ulong ParseTestValue(ReadOnlySpan<char> line)
     {
         return uint.Parse(line[(line.LastIndexOf(' ') + 1)..]);
     }
 
-    private static Func<BigInteger, BigInteger> ParseOperation(ReadOnlySpan<char> line)
+    private static Func<ulong, ulong> ParseOperation(ReadOnlySpan<char> line)
     {
         int lastSpace = line.LastIndexOf(' ');
         bool addIfTrueMultiplyIfFalse = line[lastSpace - 1] == '+';
@@ -152,9 +152,9 @@ internal ref struct ElfAccumulator
         }
     }
 
-    private static List<BigInteger> ParseItems(ReadOnlySpan<char> line)
+    private static List<ulong> ParseItems(ReadOnlySpan<char> line)
     {
-        List<BigInteger> items = new();
+        List<ulong> items = new();
 
         int index = line.IndexOf(':') + 2;
         while (true)
@@ -162,11 +162,11 @@ internal ref struct ElfAccumulator
             int nextIndex = line[index..].IndexOf(',');
             if (nextIndex == -1)
             {
-                items.Add((BigInteger)uint.Parse(line[index..]));
+                items.Add((ulong)uint.Parse(line[index..]));
                 break;
             }
 
-            items.Add((BigInteger)uint.Parse(line[index..(index + nextIndex)]));
+            items.Add((ulong)uint.Parse(line[index..(index + nextIndex)]));
             index += nextIndex + 1;
         }
 
