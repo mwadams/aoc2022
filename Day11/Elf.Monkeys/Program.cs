@@ -22,6 +22,13 @@ static void ProcessElfFile(FileInfo file)
 {
     ElfAccumulator accumulator = default;
 
+    for (int i = 0; i < Iterations; ++i)
+    {
+        string[] program = File.ReadAllLines(file.FullName);
+        accumulator = new(program);
+        accumulator.Play(20, 2, true);
+    }
+
     var sw = Stopwatch.StartNew();
     for (int i = 0; i < Iterations; ++i)
     {
@@ -33,6 +40,14 @@ static void ProcessElfFile(FileInfo file)
 
     Console.WriteLine($"{accumulator.MonkeyBusiness}");
     Console.WriteLine($"{sw.ElapsedMilliseconds / (double)Iterations}ms");
+
+    for (int i = 0; i < Iterations; ++i)
+    {
+        string[] program = File.ReadAllLines(file.FullName);
+        accumulator = new(program);
+        accumulator.Play(10000, 2, false);
+    }
+
 
     sw = Stopwatch.StartNew();
     for (int i = 0; i < Iterations; ++i)
