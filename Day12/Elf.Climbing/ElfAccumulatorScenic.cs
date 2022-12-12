@@ -50,12 +50,12 @@ internal ref struct ElfAccumulatorScenic
         if (point.X > 0)
         {
             Point p = new(point.X - 1, point.Y);
-            if (!visitedBs.Contains(p))
+            char c2 = lines[p.Y][p.X];
+            if (c2 == 'b')
             {
-                visitedBs.Add(p);
-                char c2 = lines[p.Y][p.X];
-                if (c2 == 'b')
+                if (!visitedBs.Contains(p))
                 {
+                    visitedBs.Add(p);
                     return true;
                 }
             }
@@ -64,12 +64,12 @@ internal ref struct ElfAccumulatorScenic
         if (point.Y > 0)
         {
             Point p = new(point.X, point.Y - 1);
-            if (!visitedBs.Contains(p))
+            char c2 = lines[p.Y][p.X];
+            if (c2 == 'b')
             {
-                visitedBs.Add(p);
-                char c2 = lines[p.Y][p.X];
-                if (c2 == 'b')
+                if (!visitedBs.Contains(p))
                 {
+                    visitedBs.Add(p);
                     return true;
                 }
             }
@@ -78,12 +78,12 @@ internal ref struct ElfAccumulatorScenic
         if (point.X < this.width - 1)
         {
             Point p = new(point.X + 1, point.Y);
-            if (!visitedBs.Contains(p))
+            char c2 = lines[p.Y][p.X];
+            if (c2 == 'b')
             {
-                visitedBs.Add(p);
-                char c2 = lines[p.Y][p.X];
-                if (c2 == 'b')
+                if (!visitedBs.Contains(p))
                 {
+                    visitedBs.Add(p);
                     return true;
                 }
             }
@@ -92,12 +92,12 @@ internal ref struct ElfAccumulatorScenic
         if (point.Y < this.height - 1)
         {
             Point p = new(point.X, point.Y + 1);
-            if (!visitedBs.Contains(p))
+            char c2 = lines[p.Y][p.X];
+            if (c2 == 'b')
             {
-                visitedBs.Add(p);
-                char c2 = lines[p.Y][p.X];
-                if (c2 == 'b')
+                if (!visitedBs.Contains(p))
                 {
+                    visitedBs.Add(p);
                     return true;
                 }
             }
@@ -194,12 +194,12 @@ internal ref struct ElfAccumulatorScenic
         }
     }
 
-    private static int GetConnections(string[] lines, int width, int height, Point point, Span<Point> connections, char endHeight)
+    private static int GetConnections(in string[] lines, int width, int height, Point point, Span<Point> connections, char endHeight)
     {
         int written = 0;
         char c = lines[point.Y][point.X];
         bool isStartOrEnd = c == 'S' || c == 'E';
-       
+
         if (point.X > 0)
         {
             if (isStartOrEnd)
@@ -213,6 +213,7 @@ internal ref struct ElfAccumulatorScenic
                 {
                     c2 = endHeight;
                 }
+
                 if (c2 != 'a' && c2 != 'S' && c2 - c <= 1)
                 {
                     connections[written++] = new(point.X - 1, point.Y);
@@ -233,6 +234,7 @@ internal ref struct ElfAccumulatorScenic
                 {
                     c2 = endHeight;
                 }
+
                 if (c2 != 'a' && c2 != 'S' && c2 - c <= 1)
                 {
                     connections[written++] = new(point.X, point.Y - 1);
@@ -253,6 +255,7 @@ internal ref struct ElfAccumulatorScenic
                 {
                     c2 = endHeight;
                 }
+
                 if (c2 != 'a' && c2 != 'S' && c2 - c <= 1)
                 {
                     connections[written++] = new(point.X + 1, point.Y);
@@ -273,6 +276,7 @@ internal ref struct ElfAccumulatorScenic
                 {
                     c2 = endHeight;
                 }
+
                 if (c2 != 'a' && c2 != 'S' && c2 - c <= 1)
                 {
                     connections[written++] = new(point.X, point.Y + 1);
