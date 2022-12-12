@@ -177,7 +177,7 @@ internal ref struct ElfAccumulatorScenic
         int written = 0;
         char c = lines[point.Y][point.X];
         bool isStartOrEnd = c == 'S' || c == 'E';
-
+       
         if (point.X > 0)
         {
             if (isStartOrEnd)
@@ -191,7 +191,7 @@ internal ref struct ElfAccumulatorScenic
                 {
                     c2 = endHeight;
                 }
-                if (c2 != 'S' && c2 - c <= 1)
+                if (c2 != 'a' && c2 != 'S' && c2 - c <= 1)
                 {
                     connections[written++] = new(point.X - 1, point.Y);
                 }
@@ -211,7 +211,7 @@ internal ref struct ElfAccumulatorScenic
                 {
                     c2 = endHeight;
                 }
-                if (c2 != 'S' && c2 - c <= 1)
+                if (c2 != 'a' && c2 != 'S' && c2 - c <= 1)
                 {
                     connections[written++] = new(point.X, point.Y - 1);
                 }
@@ -231,7 +231,7 @@ internal ref struct ElfAccumulatorScenic
                 {
                     c2 = endHeight;
                 }
-                if (c2 != 'S' && c2 - c <= 1)
+                if (c2 != 'a' && c2 != 'S' && c2 - c <= 1)
                 {
                     connections[written++] = new(point.X + 1, point.Y);
                 }
@@ -251,7 +251,7 @@ internal ref struct ElfAccumulatorScenic
                 {
                     c2 = endHeight;
                 }
-                if (c2 != 'S' && c2 - c <= 1)
+                if (c2 != 'a' && c2 != 'S' && c2 - c <= 1)
                 {
                     connections[written++] = new(point.X, point.Y + 1);
                 }
