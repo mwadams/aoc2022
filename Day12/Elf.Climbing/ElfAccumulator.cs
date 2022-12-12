@@ -1,7 +1,6 @@
 ﻿namespace Elf.Climbing;
 
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 internal ref struct ElfAccumulator
 {
@@ -9,7 +8,6 @@ internal ref struct ElfAccumulator
     private readonly int width;
     private readonly int height;
     private readonly Dictionary<Point, Point> parents = new();
-    private char endHeight;
 
     public int ShortestPath { get; private set; }
 
@@ -18,19 +16,21 @@ internal ref struct ElfAccumulator
         this.lines = lines;
         this.width = lines[0].Length;
         this.height = lines.Length;
+        this.ShortestPath = int.MaxValue;
     }
 
     public void FindLocation()
     {
         this.FindStartAndEnd(out Point start, out Point end);
+
         this.FindPath(start, end);
         this.ShortestPath = this.FindShortestPath(start, end);
     }
 
     private void FindStartAndEnd(out Point start, out Point end)
     {
-        start = new(-1,-1);
-        end = new(-1,-1);
+        start = new(-1, -1);
+        end = new(-1, -1);
         for (int y = 0; y < this.height; ++y)
         {
             for (int x = 0; x < this.width; ++x)
@@ -39,7 +39,7 @@ internal ref struct ElfAccumulator
                 if (c == 'S')
                 {
                     start = new(x, y);
-                    if(end.X != -1)
+                    if (end.X != -1)
                     {
                         return;
                     }
@@ -47,7 +47,6 @@ internal ref struct ElfAccumulator
                 else if (c == 'E')
                 {
                     end = new(x, y);
-                    this.endHeight = FindHighestPointAround(end);
                     if (start.X != -1)
                     {
                         return;
@@ -55,24 +54,6 @@ internal ref struct ElfAccumulator
                 }
             }
         }
-    }
-
-    private char FindHighestPointAround(Point end)
-    {
-        Point? max = null;
-
-        Span<Point> connections = stackalloc Point[4];
-        int written = GetConnections(this.lines, this.width, this.height, end, connections, 'E');
-
-        foreach (var point in connections[..written])
-        {
-            if (max is null || this.lines[point.Y][point.X] > this.lines[max.Value.Y][max.Value.X])
-            {
-                max = point;
-            }
-        }
-
-        return this.lines[max!.Value.Y][max!.Value.X];
     }
 
     private int FindShortestPath(Point start, Point end)
@@ -96,7 +77,7 @@ internal ref struct ElfAccumulator
 
         workingSet.Enqueue(start);
         visitedNodes.Add(start);
-        
+
         Span<Point> connections = stackalloc Point[4];
 
         while (workingSet.Count > 0)
@@ -108,7 +89,7 @@ internal ref struct ElfAccumulator
             }
             else
             {
-                int written = GetConnections(this.lines, this.width, this.height, current, connections, this.endHeight);
+                int written = GetConnections(this.lines, this.width, this.height, current, connections);
                 foreach (Point connection in connections[..written])
                 {
                     if (!visitedNodes.Contains(connection))
@@ -122,7 +103,7 @@ internal ref struct ElfAccumulator
         }
     }
 
-    private static int GetConnections(string[] lines, int width, int height, Point point, Span<Point> connections, char endHeight)
+    private static int GetConnections(in string[] lines, int width, int height, Point point, Span<Point> connections)
     {
         int written = 0;
         char c = lines[point.Y][point.X];
@@ -139,9 +120,10 @@ internal ref struct ElfAccumulator
                 char c2 = lines[point.Y][point.X - 1];
                 if (c2 == 'E')
                 {
-                    c2 = endHeight;
+                    c2 = 'z';
                 }
-                if (c2 != 'S' && c2 - c <= 1)
+
+                if (c2 != 'a' && c2 != 'S' && c2 - c <= 1)
                 {
                     connections[written++] = new(point.X - 1, point.Y);
                 }
@@ -159,9 +141,10 @@ internal ref struct ElfAccumulator
                 char c2 = lines[point.Y - 1][point.X];
                 if (c2 == 'E')
                 {
-                    c2 = endHeight;
+                    c2 = 'z';
                 }
-                if (c2 != 'S' && c2 - c <= 1)
+
+                if (c2 != 'a' && c2 != 'S' && c2 - c <= 1)
                 {
                     connections[written++] = new(point.X, point.Y - 1);
                 }
@@ -179,9 +162,10 @@ internal ref struct ElfAccumulator
                 char c2 = lines[point.Y][point.X + 1];
                 if (c2 == 'E')
                 {
-                    c2 = endHeight;
+                    c2 = 'z';
                 }
-                if (c2 != 'S' && c2 - c <= 1)
+
+                if (c2 != 'a' && c2 != 'S' && c2 - c <= 1)
                 {
                     connections[written++] = new(point.X + 1, point.Y);
                 }
@@ -199,9 +183,10 @@ internal ref struct ElfAccumulator
                 char c2 = lines[point.Y + 1][point.X];
                 if (c2 == 'E')
                 {
-                    c2 = endHeight;
+                    c2 = 'z';
                 }
-                if (c2 != 'S' && c2 - c <= 1)
+
+                if (c2 != 'a' && c2 != 'S' && c2 - c <= 1)
                 {
                     connections[written++] = new(point.X, point.Y + 1);
                 }

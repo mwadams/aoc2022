@@ -1,8 +1,6 @@
 ﻿namespace Elf.Climbing;
 
 using System.Collections.Generic;
-using System.Drawing;
-using System.Runtime.CompilerServices;
 
 internal ref struct ElfAccumulatorScenic
 {
