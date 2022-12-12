@@ -10,7 +10,6 @@ internal ref struct ElfAccumulatorScenic
     private readonly int width;
     private readonly int height;
     private readonly Dictionary<Point, Point> parents = new();
-    private char endHeight;
 
     public int ShortestPath { get; private set; }
 
@@ -117,7 +116,6 @@ internal ref struct ElfAccumulatorScenic
                 if (c == 'E')
                 {
                     end = new(x, y);
-                    this.endHeight = FindHighestPointAround(end);
                     return;
                 }
             }
@@ -129,7 +127,7 @@ internal ref struct ElfAccumulatorScenic
         Point? max = null;
 
         Span<Point> connections = stackalloc Point[4];
-        int written = GetConnections(this.lines, this.width, this.height, end, connections, 'E');
+        int written = GetConnections(this.lines, this.width, this.height, end, connections);
 
         foreach (var point in connections[..written])
         {
@@ -180,7 +178,7 @@ internal ref struct ElfAccumulatorScenic
             }
             else
             {
-                int written = GetConnections(this.lines, this.width, this.height, current, connections, this.endHeight);
+                int written = GetConnections(this.lines, this.width, this.height, current, connections);
                 foreach (Point connection in connections[..written])
                 {
                     if (!visitedNodes.Contains(connection))
@@ -194,7 +192,7 @@ internal ref struct ElfAccumulatorScenic
         }
     }
 
-    private static int GetConnections(in string[] lines, int width, int height, Point point, Span<Point> connections, char endHeight)
+    private static int GetConnections(in string[] lines, int width, int height, Point point, Span<Point> connections)
     {
         int written = 0;
         char c = lines[point.Y][point.X];
@@ -211,7 +209,7 @@ internal ref struct ElfAccumulatorScenic
                 char c2 = lines[point.Y][point.X - 1];
                 if (c2 == 'E')
                 {
-                    c2 = endHeight;
+                    c2 = 'z';
                 }
 
                 if (c2 != 'a' && c2 != 'S' && c2 - c <= 1)
@@ -232,7 +230,7 @@ internal ref struct ElfAccumulatorScenic
                 char c2 = lines[point.Y - 1][point.X];
                 if (c2 == 'E')
                 {
-                    c2 = endHeight;
+                    c2 = 'z';
                 }
 
                 if (c2 != 'a' && c2 != 'S' && c2 - c <= 1)
@@ -253,7 +251,7 @@ internal ref struct ElfAccumulatorScenic
                 char c2 = lines[point.Y][point.X + 1];
                 if (c2 == 'E')
                 {
-                    c2 = endHeight;
+                    c2 = 'z';
                 }
 
                 if (c2 != 'a' && c2 != 'S' && c2 - c <= 1)
@@ -274,7 +272,7 @@ internal ref struct ElfAccumulatorScenic
                 char c2 = lines[point.Y + 1][point.X];
                 if (c2 == 'E')
                 {
-                    c2 = endHeight;
+                    c2 = 'z';
                 }
 
                 if (c2 != 'a' && c2 != 'S' && c2 - c <= 1)
