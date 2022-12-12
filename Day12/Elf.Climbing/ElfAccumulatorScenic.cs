@@ -122,24 +122,6 @@ internal ref struct ElfAccumulatorScenic
         }
     }
 
-    private char FindHighestPointAround(Point end)
-    {
-        Point? max = null;
-
-        Span<Point> connections = stackalloc Point[4];
-        int written = GetConnections(this.lines, this.width, this.height, end, connections);
-
-        foreach (var point in connections[..written])
-        {
-            if (max is null || this.lines[point.Y][point.X] > this.lines[max.Value.Y][max.Value.X])
-            {
-                max = point;
-            }
-        }
-
-        return this.lines[max!.Value.Y][max!.Value.X];
-    }
-
     private int FindShortestPath(int currentShortest, Point start, Point end)
     {
         int steps = 0;
