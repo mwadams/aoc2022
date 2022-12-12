@@ -26,6 +26,8 @@ internal ref struct ElfAccumulatorScenic
     {
         this.FindEnd(out Point end);
 
+        HashSet<Point> visitedBs = new();
+
         for (int y = 0; y < this.height; ++y)
         {
             for (int x = 0; x < this.width; ++x)
@@ -33,7 +35,7 @@ internal ref struct ElfAccumulatorScenic
                 if (this.lines[y][x] == 'S' || this.lines[y][x] == 'a')
                 {
                     Point start = new(x, y);
-                    if (HasSurroundingB(start))
+                    if (HasSurroundingB(start, visitedBs))
                     {
                         this.FindPath(start, end);
                         this.ShortestPath = this.FindShortestPath(this.ShortestPath, start, end);
@@ -43,41 +45,61 @@ internal ref struct ElfAccumulatorScenic
         }
     }
 
-    private bool HasSurroundingB(Point point)
+    private bool HasSurroundingB(Point point, HashSet<Point> visitedBs)
     {
         if (point.X > 0)
         {
-            char c2 = lines[point.Y][point.X - 1];
-            if (c2 == 'b')
+            Point p = new(point.X - 1, point.Y);
+            if (!visitedBs.Contains(p))
             {
-                return true;
+                visitedBs.Add(p);
+                char c2 = lines[p.Y][p.X];
+                if (c2 == 'b')
+                {
+                    return true;
+                }
             }
         }
 
         if (point.Y > 0)
         {
-            char c2 = lines[point.Y - 1][point.X];
-            if (c2 == 'b')
+            Point p = new(point.X, point.Y - 1);
+            if (!visitedBs.Contains(p))
             {
-                return true;
+                visitedBs.Add(p);
+                char c2 = lines[p.Y][p.X];
+                if (c2 == 'b')
+                {
+                    return true;
+                }
             }
         }
 
         if (point.X < this.width - 1)
         {
-            char c2 = lines[point.Y][point.X + 1];
-            if (c2 == 'b')
+            Point p = new(point.X + 1, point.Y);
+            if (!visitedBs.Contains(p))
             {
-                return true;
+                visitedBs.Add(p);
+                char c2 = lines[p.Y][p.X];
+                if (c2 == 'b')
+                {
+                    return true;
+                }
             }
         }
 
         if (point.Y < this.height - 1)
         {
-            char c2 = lines[point.Y + 1][point.X];
-            if (c2 == 'b')
+            Point p = new(point.X, point.Y + 1);
+            if (!visitedBs.Contains(p))
             {
-                return true;
+                visitedBs.Add(p);
+                char c2 = lines[p.Y][p.X];
+                if (c2 == 'b')
+                {
+                    return true;
+                }
             }
         }
 
