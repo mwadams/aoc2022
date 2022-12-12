@@ -50,7 +50,10 @@ internal ref struct ElfAccumulator
     {
         Point? max = null;
 
-        foreach (var point in GetConnections(end))
+        Span<Point> connections = stackalloc Point[4];
+        int written = GetConnections(this.lines, this.width, this.height, end, connections);
+
+        foreach (var point in connections[..written])
         {
             if (max is null || this.lines[point.Y][point.X] > this.lines[max.Value.Y][max.Value.X])
             {
@@ -81,6 +84,9 @@ internal ref struct ElfAccumulator
         Queue<Point> workingSet = new();
         visitedNodes.Add(start);
         workingSet.Enqueue(start);
+        
+        Span<Point> connections = stackalloc Point[4];
+
         while (workingSet.Count > 0)
         {
             Point current = workingSet.Dequeue();
@@ -90,7 +96,8 @@ internal ref struct ElfAccumulator
             }
             else
             {
-                foreach (Point connection in GetConnections(current))
+                int written = GetConnections(this.lines, this.width, this.height, current, connections);
+                foreach (Point connection in connections[..written])
                 {
                     if (!visitedNodes.Contains(connection))
                     {
@@ -103,24 +110,24 @@ internal ref struct ElfAccumulator
         }
     }
 
-    private List<Point> GetConnections(Point point)
+    private static int GetConnections(string[] lines, int width, int height, Point point, Span<Point> connections)
     {
-        List<Point> connections = new();
-        char c = this.lines[point.Y][point.X];
+        int written = 0;
+        char c = lines[point.Y][point.X];
         bool isStartOrEnd = c == 'S' || c == 'E';
 
         if (point.X > 0)
         {
             if (isStartOrEnd)
             {
-                connections.Add(new(point.X - 1, point.Y));
+                connections[written++] = new(point.X - 1, point.Y);
             }
             else
             {
-                char c2 = this.lines[point.Y][point.X - 1];
+                char c2 = lines[point.Y][point.X - 1];
                 if (c2 != 'E' && c2 != 'S' && c2 - c <= 1)
                 {
-                    connections.Add(new(point.X - 1, point.Y));
+                    connections[written++] = new(point.X - 1, point.Y);
                 }
             }
         }
@@ -129,14 +136,14 @@ internal ref struct ElfAccumulator
         {
             if (isStartOrEnd)
             {
-                connections.Add(new(point.X, point.Y - 1));
+                connections[written++] = new(point.X, point.Y - 1);
             }
             else
             {
-                char c2 = this.lines[point.Y - 1][point.X];
+                char c2 = lines[point.Y - 1][point.X];
                 if (c2 != 'E' && c2 != 'S' && c2 - c <= 1)
                 {
-                    connections.Add(new(point.X, point.Y - 1));
+                    connections[written++] = new(point.X, point.Y - 1);
                 }
             }
         }
@@ -145,14 +152,14 @@ internal ref struct ElfAccumulator
         {
             if (isStartOrEnd)
             {
-                connections.Add(new(point.X + 1, point.Y));
+                connections[written++] = new(point.X + 1, point.Y);
             }
             else
             {
-                char c2 = this.lines[point.Y][point.X + 1];
+                char c2 = lines[point.Y][point.X + 1];
                 if (c2 != 'E' && c2 != 'S' && c2 - c <= 1)
                 {
-                    connections.Add(new(point.X + 1, point.Y));
+                    connections[written++] = new(point.X + 1, point.Y);
                 }
             }
         }
@@ -161,18 +168,18 @@ internal ref struct ElfAccumulator
         {
             if (isStartOrEnd)
             {
-                connections.Add(new(point.X, point.Y + 1));
+                connections[written++] = new(point.X, point.Y + 1);
             }
             else
             {
-                char c2 = this.lines[point.Y + 1][point.X];
+                char c2 = lines[point.Y + 1][point.X];
                 if (c2 != 'E' && c2 != 'S' && c2 - c <= 1)
                 {
-                    connections.Add(new(point.X, point.Y + 1));
+                    connections[written++] = new(point.X, point.Y + 1);
                 }
             }
         }
 
-        return connections;
+        return written;
     }
 }
