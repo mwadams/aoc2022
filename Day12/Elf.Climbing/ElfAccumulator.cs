@@ -28,19 +28,28 @@ internal ref struct ElfAccumulator
 
     private void FindStartAndEnd(out Point start, out Point end)
     {
-        start = default;
-        end = default;
+        start = new(-1,-1);
+        end = new(-1,-1);
         for (int y = 0; y < this.height; ++y)
         {
             for (int x = 0; x < this.width; ++x)
             {
-                if (this.lines[y][x] == 'S')
+                char c = this.lines[y][x];
+                if (c == 'S')
                 {
                     start = new(x, y);
+                    if(end.X != -1)
+                    {
+                        return;
+                    }
                 }
-                else if (this.lines[y][x] == 'E')
+                else if (c == 'E')
                 {
                     end = new(x, y);
+                    if (start.X != -1)
+                    {
+                        return;
+                    }
                 }
             }
         }
@@ -102,7 +111,7 @@ internal ref struct ElfAccumulator
                     if (!visitedNodes.Contains(connection))
                     {
                         visitedNodes.Add(connection);
-                        this.parents[new(connection.X, connection.Y)] = current;
+                        this.parents[connection] = current;
                         workingSet.Enqueue(connection);
                     }
                 }
