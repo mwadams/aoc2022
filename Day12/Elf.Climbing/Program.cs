@@ -16,7 +16,7 @@ rootCommand.SetHandler(
 
 return await rootCommand.InvokeAsync(args);
 
-const int Iterations = 1000;
+const int Iterations = 100;
 
 static void ProcessElfFile(FileInfo file)
 {
@@ -24,14 +24,44 @@ static void ProcessElfFile(FileInfo file)
 
     ElfAccumulator accumulator = default;
 
+    // Warmup
+    for (int i = 0; i < Iterations; ++i)
+    {
+        accumulator = new(lines);
+        accumulator.FindLocation();
+    }
+
     var sw = Stopwatch.StartNew();
     for (int i = 0; i < Iterations; ++i)
     {
         accumulator = new(lines);
         accumulator.FindLocation();
     }
+
     sw.Stop();
 
     Console.WriteLine($"{accumulator.ShortestPath}");
+    Console.WriteLine($"{sw.ElapsedMilliseconds / (double)Iterations}ms");
+
+
+    ElfAccumulatorScenic accumulatorScenic = default;
+
+    // Warmup
+    for (int i = 0; i < Iterations; ++i)
+    {
+        accumulatorScenic = new(lines);
+        accumulatorScenic.FindLocation();
+    }
+
+    sw = Stopwatch.StartNew();
+    for (int i = 0; i < Iterations; ++i)
+    {
+        accumulatorScenic = new(lines);
+        accumulatorScenic.FindLocation();
+    }
+
+    sw.Stop();
+
+    Console.WriteLine($"{accumulatorScenic.ShortestPath}");
     Console.WriteLine($"{sw.ElapsedMilliseconds / (double)Iterations}ms");
 }
