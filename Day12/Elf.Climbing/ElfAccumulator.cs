@@ -1,15 +1,13 @@
 ﻿namespace Elf.Climbing;
 
-using System;
-using System.ComponentModel;
-using System.Text;
+using System.Collections.Generic;
 
 internal ref struct ElfAccumulator
 {
     private readonly string[] lines;
     private readonly int width;
     private readonly int height;
-    private readonly Node[,] matrix;
+    private readonly Dictionary<Point, Point> parents = new();
 
     public int ShortestPath { get; private set; }
 
@@ -18,29 +16,49 @@ internal ref struct ElfAccumulator
         this.lines = lines;
         this.width = lines[0].Length;
         this.height = lines.Length;
-        this.matrix = new Node[this.width, this.height];
     }
 
     public void FindLocation()
     {
-        HashSet<Point> unvisitedNodes = this.BuildMap(out Point start, out Point end);
+        this.FindStartAndEnd(out Point start, out Point end);
         Point highPoint = this.FindHighestPointAround(end);
-        this.FindPath(unvisitedNodes, start, highPoint);
+        this.FindPath(start, highPoint);
         this.ShortestPath = this.FindShortestPath(start, highPoint);
+    }
+
+    private void FindStartAndEnd(out Point start, out Point end)
+    {
+        start = default;
+        end = default;
+        for (int y = 0; y < this.height; ++y)
+        {
+            for (int x = 0; x < this.width; ++x)
+            {
+                if (this.lines[y][x] == 'S')
+                {
+                    start = new(x, y);
+                }
+                else if (this.lines[y][x] == 'E')
+                {
+                    end = new(x, y);
+                }
+            }
+        }
     }
 
     private Point FindHighestPointAround(Point end)
     {
-        Node? max = null;
-        foreach(var point in this.matrix[end.X, end.Y].Connections)
+        Point? max = null;
+
+        foreach (var point in GetConnections(end))
         {
-            if (max is null || this.matrix[point.X, point.Y].Height > max.Value.Height)
+            if (max is null || this.lines[point.Y][point.X] > this.lines[max.Value.Y][max.Value.X])
             {
-                max = this.matrix[point.X, point.Y];
+                max = point;
             }
         }
 
-        return max!.Value.Location;
+        return max!.Value;
     }
 
     private int FindShortestPath(Point start, Point end)
@@ -51,16 +69,17 @@ internal ref struct ElfAccumulator
         while (current != start)
         {
             steps++;
-            current = this.matrix[current.X, current.Y].Parent;
+            current = this.parents[current];
         }
 
         return steps;
     }
 
-    private void FindPath(HashSet<Point> unvisitedNodes, Point start, Point end)
+    private void FindPath(Point start, Point end)
     {
+        HashSet<Point> visitedNodes = new();
         Queue<Point> workingSet = new();
-        unvisitedNodes.Remove(start);
+        visitedNodes.Add(start);
         workingSet.Enqueue(start);
         while (workingSet.Count > 0)
         {
@@ -71,12 +90,12 @@ internal ref struct ElfAccumulator
             }
             else
             {
-                foreach (Point connection in this.matrix[current.X, current.Y].Connections)
+                foreach (Point connection in GetConnections(current))
                 {
-                    if (unvisitedNodes.Contains(connection))
+                    if (!visitedNodes.Contains(connection))
                     {
-                        unvisitedNodes.Remove(connection);
-                        this.matrix[connection.X, connection.Y].Parent = current;
+                        visitedNodes.Add(connection);
+                        this.parents[new(connection.X, connection.Y)] = current;
                         workingSet.Enqueue(connection);
                     }
                 }
@@ -84,100 +103,72 @@ internal ref struct ElfAccumulator
         }
     }
 
-    private HashSet<Point> BuildMap(out Point start, out Point end)
-    {
-        start = new Point(0, 0);
-        end = new Point(0, 0);
-        HashSet<Point> unvisitedNodes = new();
-        for (int y = 0; y < this.height; ++y)
-        {
-            for (int x = 0; x < this.width; ++x)
-            {
-                char c = lines[y][x];
-
-                if (c == 'S')
-                {
-                    start = new Point(x, y);
-                }
-                else if (c == 'E')
-                {
-                    end = new Point(x, y);
-                }
-
-                var node = new Node(new(x, y), c, BuildConnections(c, x, y), new(-1,-1));
-                matrix[x, y] = node;
-                unvisitedNodes.Add(new(x, y));
-            }
-        }
-
-        return unvisitedNodes;
-    }
-
-    private List<Point> BuildConnections(char c, int x, int y)
+    private List<Point> GetConnections(Point point)
     {
         List<Point> connections = new();
+        char c = this.lines[point.Y][point.X];
         bool isStartOrEnd = c == 'S' || c == 'E';
 
-        if (x > 0)
+        if (point.X > 0)
         {
             if (isStartOrEnd)
             {
-                connections.Add(new(x - 1, y));
+                connections.Add(new(point.X - 1, point.Y));
             }
             else
             {
-                char c2 = this.lines[y][x - 1];
+                char c2 = this.lines[point.Y][point.X - 1];
                 if (c2 != 'E' && c2 != 'S' && c2 - c <= 1)
                 {
-                    connections.Add(new(x - 1, y));
+                    connections.Add(new(point.X - 1, point.Y));
                 }
             }
         }
 
-        if (y > 0)
+        if (point.Y > 0)
         {
             if (isStartOrEnd)
             {
-                connections.Add(new(x, y - 1));
+                connections.Add(new(point.X, point.Y - 1));
             }
             else
             {
-                char c2 = this.lines[y - 1][x];
+                char c2 = this.lines[point.Y - 1][point.X];
                 if (c2 != 'E' && c2 != 'S' && c2 - c <= 1)
                 {
-                    connections.Add(new(x, y - 1));
+                    connections.Add(new(point.X, point.Y - 1));
                 }
             }
         }
 
-        if (x < width - 1)
+        if (point.X < width - 1)
         {
             if (isStartOrEnd)
             {
-                connections.Add(new(x + 1, y));
+                connections.Add(new(point.X + 1, point.Y));
             }
             else
             {
-                char c2 = this.lines[y][x + 1];
+                char c2 = this.lines[point.Y][point.X + 1];
                 if (c2 != 'E' && c2 != 'S' && c2 - c <= 1)
                 {
-                    connections.Add(new(x + 1, y));
+                    connections.Add(new(point.X + 1, point.Y));
                 }
             }
         }
 
-        if (y < height - 1)
+        if (point.Y < height - 1)
         {
             if (isStartOrEnd)
             {
-                connections.Add(new(x, y + 1));
+                connections.Add(new(point.X, point.Y + 1));
             }
             else
             {
-                char c2 = this.lines[y + 1][x];
+                char c2 = this.lines[point.Y + 1][point.X];
                 if (c2 != 'E' && c2 != 'S' && c2 - c <= 1)
                 {
-                    connections.Add(new(x, y + 1));
+                    connections.Add(new(point.X, point.Y + 1));
                 }
             }
         }
