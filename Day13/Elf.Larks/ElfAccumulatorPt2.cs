@@ -20,44 +20,8 @@ internal ref struct ElfAccumulatorPt2
         Span<Node> orderedLines = new Node[lines.Length + 2];
         int written = BuildLines(this.lines, orderedLines);
         orderedLines = orderedLines[..written];
-        Sort(orderedLines);
+        orderedLines.Sort((lhs, rhs) => lhs.Compare(rhs) == Status.InOrder ? -1 : 1);
         return CalculateResult(orderedLines);
-    }
-
-    private static void Sort(Span<Node> orderedLines)
-    {
-        int foundMarkers = 0;
-
-        // Bubblesort
-        int length = orderedLines.Length;
-        do
-        {
-            int newLength = 0;
-            for (int i = 1; i < length; ++i)
-            {
-                if (orderedLines[i - 1].Compare(orderedLines[i]) == Status.OutOfOrder)
-                {
-                    // Use tuple to swap values
-                    (orderedLines[i], orderedLines[i - 1]) = (orderedLines[i - 1], orderedLines[i]);
-                    newLength = i;
-                }
-            }
-
-            length = newLength;
-            // We can give up when both markers are at the bottom of a sort.
-            if (orderedLines[length].IsMarker)
-            {
-                if (foundMarkers == 1)
-                {
-                    return;
-                }
-
-                foundMarkers++;
-
-            }
-
-        }
-        while (length > 0);
     }
 
     private static int BuildLines(string[] lines, Span<Node> orderedLines)
