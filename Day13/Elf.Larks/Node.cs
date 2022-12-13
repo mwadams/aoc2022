@@ -62,13 +62,13 @@ public readonly struct Node
             {
                 return result;
             }
-        }
-        else
-        {
-            return Status.InOrder;
+            else
+            {
+                return Status.OutOfOrder;
+            }
         }
 
-        return Status.OutOfOrder;
+        return Status.InOrder;
     }
 
     public Status Compare(in Node rhs)
