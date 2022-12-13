@@ -32,6 +32,55 @@ public readonly struct Node
         this.IsMarker = isMarker;
     }
 
+    private static Status CompareListifiedLeftToListRight(in Node lhs, in Node rhs)
+    {
+        if (rhs.children.Count == 0)
+        {
+            return Status.OutOfOrder;
+        }
+
+        var result = lhs.Compare(rhs.children[0]);
+        if (result != Status.Continue)
+        {
+            return result;
+        }
+
+        if (rhs.children.Count >= 1)
+        {
+            return Status.InOrder;
+        }
+
+        return Status.Continue;
+    }
+
+    private static Status CompareListLeftToListifiedRight(in Node lhs, in Node rhs)
+    {
+        int leftIndex = 0;
+        int rightIndex = 0;
+        while (leftIndex < lhs.children.Count)
+        {
+            if (rightIndex >= 1)
+            {
+                return Status.OutOfOrder;
+            }
+
+            var result = lhs.children[leftIndex].Compare(rhs);
+            if (result != Status.Continue)
+            {
+                return result;
+            }
+
+            ++leftIndex;
+            ++rightIndex;
+        }
+
+        if (rightIndex < 1)
+        {
+            return Status.InOrder;
+        }
+
+        return Status.Continue;
+    }
 
     public Status Compare(Node rhs)
     {
@@ -43,18 +92,18 @@ public readonly struct Node
             }
             else
             {
-                return new Node(new List<Node> { this }, false).Compare(rhs);
+                return CompareListifiedLeftToListRight(this, rhs);
             }
         }
         else if (rhs.value is int)
         {
-            return this.Compare(new Node(new List<Node> { rhs }, false));
+            return CompareListLeftToListifiedRight(this, rhs);
         }
         else
         {
             int leftIndex = 0;
             int rightIndex = 0;
-            while(leftIndex < this.children.Count)
+            while (leftIndex < this.children.Count)
             {
                 if (rightIndex >= rhs.children.Count)
                 {
@@ -96,7 +145,7 @@ public readonly struct Node
         {
             str.Append('[');
             bool first = true;
-            foreach(var child in this.children)
+            foreach (var child in this.children)
             {
                 if (first)
                 {
