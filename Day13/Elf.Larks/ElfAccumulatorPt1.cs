@@ -28,10 +28,10 @@ internal ref struct ElfAccumulatorPt1
 
     private bool CompareLines(ReadOnlySpan<char> lhs, ReadOnlySpan<char> rhs)
     {
-        var lhsResult = ParseArray(lhs);
-        var rhsResult = ParseArray(rhs);
+        var (ValueLhs, _) = ParseArray(lhs);
+        var (ValueRhs, _) = ParseArray(rhs);
 
-        return lhsResult.Value.Compare(rhsResult.Value) == Status.InOrder;
+        return ValueLhs.Compare(ValueRhs) == Status.InOrder;
     }
 
     private (Node Value, int Consumed) ParseArray(ReadOnlySpan<char> value)
@@ -47,16 +47,16 @@ internal ref struct ElfAccumulatorPt1
                     return (new Node(items, false), i + 1);
                 case '[':
                     {
-                        var result = ParseArray(value[i..]);
-                        i += result.Consumed;
-                        items.Add(result.Value);
+                        var (Value, Consumed) = ParseArray(value[i..]);
+                        i += Consumed;
+                        items.Add(Value);
                         break;
                     }
                 default:
                     {
-                        var result = ParseInteger(value[i..]);
-                        i += result.Consumed;
-                        items.Add(result.Value);
+                        var (Value, Consumed) = ParseInteger(value[i..]);
+                        i += Consumed;
+                        items.Add(Value);
                         break;
                     }
             }
@@ -65,7 +65,7 @@ internal ref struct ElfAccumulatorPt1
         return (new Node(items, false), value.Length);
     }
 
-    private (Node Value, int Consumed) ParseInteger(ReadOnlySpan<char> value)
+    private static (Node Value, int Consumed) ParseInteger(ReadOnlySpan<char> value)
     {
         int index = 0;
         while (value[index] != ',' && value[index] != ']')
