@@ -1,5 +1,7 @@
 ﻿namespace Elf.Larks;
 
+using System.Text;
+
 public enum Status
 {
     Continue,
@@ -15,13 +17,6 @@ public readonly struct Node
     private readonly int? value;
 
     public bool IsMarker { get; }
-
-    public Node(int? value, List<Node> children, bool isMarker)
-    {
-        this.value = value;
-        this.children = children;
-        IsMarker = isMarker;
-    }
 
     public Node(int value, bool isMarker)
     {
@@ -82,6 +77,39 @@ public readonly struct Node
             }
 
             return Status.Continue;
+        }
+    }
+
+    public override string ToString()
+    {
+        StringBuilder str = new();
+        this.WriteTo(str);
+        return str.ToString();
+    }
+    private void WriteTo(StringBuilder str)
+    {
+        if (this.value is int v)
+        {
+            str.Append(v);
+        }
+        else
+        {
+            str.Append('[');
+            bool first = true;
+            foreach(var child in this.children)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    str.Append(',');
+                }
+
+                child.WriteTo(str);
+            }
+            str.Append("]");
         }
     }
 
