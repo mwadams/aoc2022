@@ -3,10 +3,10 @@
 using System;
 using System.Collections.Generic;
 
-internal ref struct ElfAccumulatorPt2
+internal readonly ref struct ElfAccumulatorPt2
 {
-    private static readonly Node Divider1 = ParseArray("[[2]]", true).Value;
-    private static readonly Node Divider2 = ParseArray("[[6]]", true).Value;
+    private static readonly Node Divider1 = ParseArray("[[2]]").Value;
+    private static readonly Node Divider2 = ParseArray("[[6]]").Value;
 
     private readonly string[] lines;
 
@@ -40,26 +40,37 @@ internal ref struct ElfAccumulatorPt2
 
     private static int CalculateResult(ReadOnlySpan<Node> orderedLines)
     {
-        int found = 0;
+        bool found1 = false;
+        bool found2 = false;
         int result = 1;
         for (int i = 0; i < orderedLines.Length; ++i)
         {
             Node value = orderedLines[i];
-            if (value.IsMarker)
+            if (!found1 && value.Compare(Divider1) == Status.Continue)
             {
-                if (found == 1)
+                if (found2)
                 {
                     return result * (i + 1);
                 }
                 result *= i + 1;
-                found++;
+                found1 = true; ;
+            }
+
+            if (!found2 && value.Compare(Divider2) == Status.Continue)
+            {
+                if (found1)
+                {
+                    return result * (i + 1);
+                }
+                result *= i + 1;
+                found2 = true; ;
             }
         }
 
         throw new InvalidOperationException("Didn't find the boundary markers!");
     }
 
-    private static (Node Value, int Consumed) ParseArray(ReadOnlySpan<char> value, bool isMarker = false)
+    private static (Node Value, int Consumed) ParseArray(ReadOnlySpan<char> value)
     {
         List<Node> items = new();
         for (int i = 1; i < value.Length; ++i)
@@ -69,25 +80,25 @@ internal ref struct ElfAccumulatorPt2
                 case ',':
                     continue;
                 case ']':
-                    return (new Node(items, isMarker), i + 1);
+                    return (new Node(items), i + 1);
                 case '[':
                     {
-                        var result = ParseArray(value[i..]);
-                        i += result.Consumed;
-                        items.Add(result.Value);
+                        var (Value, Consumed) = ParseArray(value[i..]);
+                        i += Consumed;
+                        items.Add(Value);
                         break;
                     }
                 default:
                     {
-                        var result = ParseInteger(value[i..]);
-                        i += result.Consumed;
-                        items.Add(result.Value);
+                        var (Value, Consumed) = ParseInteger(value[i..]);
+                        i += Consumed;
+                        items.Add(Value);
                         break;
                     }
             }
         }
 
-        return (new Node(items, isMarker), value.Length);
+        return (new Node(items), value.Length);
     }
 
     private static (Node Value, int Consumed) ParseInteger(ReadOnlySpan<char> value)
@@ -98,6 +109,6 @@ internal ref struct ElfAccumulatorPt2
             ++index;
         }
 
-        return (new Node(int.Parse(value[..index]), false), index - 1);
+        return (new Node(int.Parse(value[..index])), index - 1);
     }
 }

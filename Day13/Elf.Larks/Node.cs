@@ -16,20 +16,16 @@ public readonly struct Node
     private readonly List<Node> children;
     private readonly int? value;
 
-    public bool IsMarker { get; }
-
-    public Node(int value, bool isMarker)
+    public Node(int value)
     {
         this.children = Empty;
         this.value = value;
-        IsMarker = isMarker;
     }
 
-    public Node(List<Node> children, bool isMarker)
+    public Node(List<Node> children)
     {
         this.children = children;
         this.value = null;
-        this.IsMarker = isMarker;
     }
 
     private static Status CompareListifiedLeftToListRight(in Node lhs, in Node rhs)
