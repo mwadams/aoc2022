@@ -23,4 +23,10 @@ static void ProcessElfFile(FileInfo file)
     int result = accumulator.ProcessLines();
 
     Console.WriteLine(result);
+
+
+    ElfAccumulatorPt2 accumulator2 = new(lines);
+    int result2 = accumulator2.ProcessLines();
+
+    Console.WriteLine(result2);
 }
