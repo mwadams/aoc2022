@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 
-internal ref struct ElfAccumulatorPt1
+internal readonly ref struct ElfAccumulatorPt1
 {
     private readonly string[] lines;
 
