@@ -20,4 +20,7 @@ static void ProcessElfFile(FileInfo file)
     string[] lines = File.ReadAllLines(file.FullName);
 
     ElfAccumulatorPt1 accumulator = new(lines);
+    int result = accumulator.ProcessLines();
+
+    Console.WriteLine(result);
 }
