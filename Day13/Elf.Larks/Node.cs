@@ -51,7 +51,7 @@ public readonly struct Node
                 return new Node(new List<Node> { this }, false).Compare(rhs);
             }
         }
-        else if (rhs.value is int rhsValue)
+        else if (rhs.value is int)
         {
             return this.Compare(new Node(new List<Node> { rhs }, false));
         }
