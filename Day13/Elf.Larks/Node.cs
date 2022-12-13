@@ -11,7 +11,7 @@ public enum Status
 
 public readonly struct Node
 {
-    private static readonly List<Node> Empty = new List<Node>();
+    private static readonly List<Node> Empty = new();
 
     private readonly List<Node> children;
     private readonly int? value;
@@ -158,7 +158,7 @@ public readonly struct Node
 
                 child.WriteTo(str);
             }
-            str.Append("]");
+            str.Append(']');
         }
     }
 
