@@ -26,23 +26,25 @@ internal ref struct ElfAccumulatorPt2
 
     private static void Sort(Span<string> orderedLines)
     {
-        int n = orderedLines.Length;
+        // Bubblesort
+        int length = orderedLines.Length;
         do
         {
-            bool swapped = false;
-            for (int i = 1; i < n; ++i)
+            int newLength = 0;
+            for (int i = 1; i < length; ++i)
             {
                 if (!CompareLines(orderedLines[i - 1], orderedLines[i]))
                 {
                     // Use tuple to swap values
                     (orderedLines[i], orderedLines[i - 1]) = (orderedLines[i - 1], orderedLines[i]);
-                    swapped = true;
+                    newLength = i;
                 }
             }
-        }
-        while (false);
-    }
 
+            length = newLength;
+        }
+        while (length > 0);
+    }
 
     private static int BuildLines(string[] lines, Span<string> orderedLines)
     {
