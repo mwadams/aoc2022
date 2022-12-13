@@ -16,7 +16,7 @@ rootCommand.SetHandler(
 
 return await rootCommand.InvokeAsync(args);
 
-const int Iterations = 100;
+const int Iterations = 1000;
 
 static void ProcessElfFile(FileInfo file)
 {
