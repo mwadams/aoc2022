@@ -55,12 +55,31 @@ public readonly struct Node
 
     private static Status CompareListLeftToListifiedRight(in Node lhs, in Node rhs)
     {
-        if (lhs.children.Count == 0)
+        int leftIndex = 0;
+        int rightIndex = 0;
+        while (leftIndex < lhs.children.Count)
+        {
+            if (rightIndex >= 1)
+            {
+                return Status.OutOfOrder;
+            }
+
+            var result = lhs.children[leftIndex].Compare(rhs);
+            if (result != Status.Continue)
+            {
+                return result;
+            }
+
+            ++leftIndex;
+            ++rightIndex;
+        }
+
+        if (rightIndex < 1)
         {
             return Status.InOrder;
         }
-        
-        return lhs.children[0].Compare(rhs);
+
+        return Status.Continue;
     }
 
     public Status Compare(in Node rhs)
