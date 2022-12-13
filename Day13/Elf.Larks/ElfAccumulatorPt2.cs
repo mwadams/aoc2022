@@ -35,7 +35,7 @@ internal ref struct ElfAccumulatorPt2
             int newLength = 0;
             for (int i = 1; i < length; ++i)
             {
-                if (!CompareLines(orderedLines[i - 1], orderedLines[i]))
+                if (orderedLines[i - 1].Compare(orderedLines[i]) == Status.OutOfOrder)
                 {
                     // Use tuple to swap values
                     (orderedLines[i], orderedLines[i - 1]) = (orderedLines[i - 1], orderedLines[i]);
@@ -96,11 +96,6 @@ internal ref struct ElfAccumulatorPt2
         }
 
         throw new InvalidOperationException("Didn't find the boundary markers!");
-    }
-
-    private static bool CompareLines(Node lhs, Node rhs)
-    {
-        return lhs.Compare(rhs) == Status.InOrder;
     }
 
     private static (Node Value, int Consumed) ParseArray(ReadOnlySpan<char> value, bool isMarker = false)

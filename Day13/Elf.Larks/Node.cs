@@ -82,7 +82,7 @@ public readonly struct Node
         return Status.Continue;
     }
 
-    public Status Compare(Node rhs)
+    public Status Compare(in Node rhs)
     {
         if (this.value is int lhsValue)
         {

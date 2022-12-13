@@ -73,6 +73,6 @@ internal ref struct ElfAccumulatorPt1
             ++index;
         }
 
-        return (new Node(int.Parse(value[..index]),false), index - 1);
+        return (new Node(int.Parse(value[..index]), false), index - 1);
     }
 }
