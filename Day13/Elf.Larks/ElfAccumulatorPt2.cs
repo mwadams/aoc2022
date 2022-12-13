@@ -5,8 +5,8 @@ using System.Collections.Generic;
 
 internal ref struct ElfAccumulatorPt2
 {
-    private const string Divider1 = "[[2]]";
-    private const string Divider2 = "[[6]]";
+    private static readonly Node Divider1 = ParseArray("[[2]]", true).Value;
+    private static readonly Node Divider2 = ParseArray("[[6]]", true).Value;
 
     private readonly string[] lines;
 
@@ -17,14 +17,14 @@ internal ref struct ElfAccumulatorPt2
 
     public int ProcessLines()
     {
-        Span<string> orderedLines = new string[lines.Length + 2];
+        Span<Node> orderedLines = new Node[lines.Length + 2];
         int written = BuildLines(this.lines, orderedLines);
         orderedLines = orderedLines[..written];
         Sort(orderedLines);
         return CalculateResult(orderedLines);
     }
 
-    private static void Sort(Span<string> orderedLines)
+    private static void Sort(Span<Node> orderedLines)
     {
         // Bubblesort
         int length = orderedLines.Length;
@@ -46,14 +46,14 @@ internal ref struct ElfAccumulatorPt2
         while (length > 0);
     }
 
-    private static int BuildLines(string[] lines, Span<string> orderedLines)
+    private static int BuildLines(string[] lines, Span<Node> orderedLines)
     {
         int i = 0;
         foreach (var line in lines)
         {
             if (line.Length > 0)
             {
-                orderedLines[i++] = line;
+                orderedLines[i++] = ParseArray(line).Value;
             }
         }
 
@@ -62,48 +62,33 @@ internal ref struct ElfAccumulatorPt2
         return i;
     }
 
-    private static int CalculateResult(ReadOnlySpan<string> orderedLines)
+    private static int CalculateResult(ReadOnlySpan<Node> orderedLines)
     {
-        bool found1 = false;
-        bool found2 = false;
-
+        int found = 0;
         int result = 1;
         for (int i = 0; i < orderedLines.Length; ++i)
         {
-            string value = orderedLines[i];
-            if (value == Divider1)
+            Node value = orderedLines[i];
+            if (value.IsMarker)
             {
-                if (found2)
+                if (found == 1)
                 {
                     return result * (i + 1);
                 }
                 result *= i + 1;
-                found1 = true;
-            }
-
-            if (value == Divider2)
-            {
-                if (found1)
-                {
-                    return result * (i + 1);
-                }
-                result *= i + 1;
-                found2 = true;
+                found++;
             }
         }
 
         throw new InvalidOperationException("Didn't find the boundary markers!");
     }
 
-    private static bool CompareLines(ReadOnlySpan<char> lhs, ReadOnlySpan<char> rhs)
+    private static bool CompareLines(Node lhs, Node rhs)
     {
-        var lhsResult = ParseArray(lhs);
-        var rhsResult = ParseArray(rhs);
-
-        return lhsResult.Value.Compare(rhsResult.Value) == Status.InOrder;
+        return lhs.Compare(rhs) == Status.InOrder;
     }
 
-    private static (Node Value, int Consumed) ParseArray(ReadOnlySpan<char> value)
+    private static (Node Value, int Consumed) ParseArray(ReadOnlySpan<char> value, bool isMarker = false)
     {
         List<Node> items = new();
         for (int i = 1; i < value.Length; ++i)
@@ -113,7 +98,7 @@ internal ref struct ElfAccumulatorPt2
                 case ',':
                     continue;
                 case ']':
-                    return (new Node(items), i + 1);
+                    return (new Node(items, isMarker), i + 1);
                 case '[':
                     {
                         var result = ParseArray(value[i..]);
@@ -131,7 +116,7 @@ internal ref struct ElfAccumulatorPt2
             }
         }
 
-        return (new Node(items), value.Length);
+        return (new Node(items, isMarker), value.Length);
     }
 
     private static (Node Value, int Consumed) ParseInteger(ReadOnlySpan<char> value)
@@ -142,6 +127,6 @@ internal ref struct ElfAccumulatorPt2
             ++index;
         }
 
-        return (new Node(int.Parse(value[..index])), index - 1);
+        return (new Node(int.Parse(value[..index]), false), index - 1);
     }
 }

@@ -44,7 +44,7 @@ internal ref struct ElfAccumulatorPt1
                 case ',':
                     continue;
                 case ']':
-                    return (new Node(items), i + 1);
+                    return (new Node(items, false), i + 1);
                 case '[':
                     {
                         var result = ParseArray(value[i..]);
@@ -62,7 +62,7 @@ internal ref struct ElfAccumulatorPt1
             }
         }
 
-        return (new Node(items), value.Length);
+        return (new Node(items, false), value.Length);
     }
 
     private (Node Value, int Consumed) ParseInteger(ReadOnlySpan<char> value)
@@ -73,6 +73,6 @@ internal ref struct ElfAccumulatorPt1
             ++index;
         }
 
-        return (new Node(int.Parse(value[..index])), index - 1);
+        return (new Node(int.Parse(value[..index]),false), index - 1);
     }
 }

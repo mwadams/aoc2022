@@ -14,16 +14,27 @@ public readonly struct Node
     private readonly List<Node> children;
     private readonly int? value;
 
-    public Node(int value)
+    public bool IsMarker { get; }
+
+    public Node(int? value, List<Node> children, bool isMarker)
+    {
+        this.value = value;
+        this.children = children;
+        IsMarker = isMarker;
+    }
+
+    public Node(int value, bool isMarker)
     {
         this.children = Empty;
         this.value = value;
+        IsMarker = isMarker;
     }
 
-    public Node(List<Node> children)
+    public Node(List<Node> children, bool isMarker)
     {
         this.children = children;
         this.value = null;
+        this.IsMarker = isMarker;
     }
 
 
@@ -37,12 +48,12 @@ public readonly struct Node
             }
             else
             {
-                return new Node(new List<Node> { this }).Compare(rhs);
+                return new Node(new List<Node> { this }, false).Compare(rhs);
             }
         }
         else if (rhs.value is int rhsValue)
         {
-            return this.Compare(new Node(new List<Node> { rhs }));
+            return this.Compare(new Node(new List<Node> { rhs }, false));
         }
         else
         {
