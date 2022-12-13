@@ -20,7 +20,7 @@ internal ref struct ElfAccumulatorPt2
         Span<Node> orderedLines = new Node[lines.Length + 2];
         int written = BuildLines(this.lines, orderedLines);
         orderedLines = orderedLines[..written];
-        orderedLines.Sort((lhs, rhs) => lhs.Compare(rhs) == Status.InOrder ? -1 : 1);
+        orderedLines.Sort((lhs, rhs) => (int)lhs.Compare(rhs));
         return CalculateResult(orderedLines);
     }
 

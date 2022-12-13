@@ -4,9 +4,9 @@ using System.Text;
 
 public enum Status
 {
-    Continue,
-    InOrder,
-    OutOfOrder
+    InOrder = -1,
+    Continue = 0,
+    OutOfOrder = 1
 }
 
 public readonly struct Node
