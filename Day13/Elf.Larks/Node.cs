@@ -64,7 +64,12 @@ public readonly struct Node
             }
             else
             {
-                return Status.OutOfOrder;
+                if (lhs.children.Count > 1)
+                {
+                    return Status.OutOfOrder;
+                }
+
+                return Status.Continue;
             }
         }
 
