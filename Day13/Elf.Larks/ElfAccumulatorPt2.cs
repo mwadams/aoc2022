@@ -26,6 +26,8 @@ internal ref struct ElfAccumulatorPt2
 
     private static void Sort(Span<Node> orderedLines)
     {
+        int foundMarkers = 0;
+
         // Bubblesort
         int length = orderedLines.Length;
         do
@@ -42,6 +44,18 @@ internal ref struct ElfAccumulatorPt2
             }
 
             length = newLength;
+            // We can give up when both markers are at the bottom of a sort.
+            if (orderedLines[length].IsMarker)
+            {
+                if (foundMarkers == 1)
+                {
+                    return;
+                }
+
+                foundMarkers++;
+
+            }
+
         }
         while (length > 0);
     }
@@ -49,6 +63,9 @@ internal ref struct ElfAccumulatorPt2
     private static int BuildLines(string[] lines, Span<Node> orderedLines)
     {
         int i = 0;
+        orderedLines[i++] = Divider1;
+        orderedLines[i++] = Divider2;
+
         foreach (var line in lines)
         {
             if (line.Length > 0)
@@ -57,8 +74,6 @@ internal ref struct ElfAccumulatorPt2
             }
         }
 
-        orderedLines[i++] = Divider1;
-        orderedLines[i++] = Divider2;
         return i;
     }
 
