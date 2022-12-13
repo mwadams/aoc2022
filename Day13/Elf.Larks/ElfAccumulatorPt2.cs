@@ -46,7 +46,7 @@ internal readonly ref struct ElfAccumulatorPt2
         for (int i = 0; i < orderedLines.Length; ++i)
         {
             Node value = orderedLines[i];
-            if (!found1 && value.Compare(Divider1) == Status.Continue)
+            if (!found1 && value.Is(Divider1))
             {
                 if (found2)
                 {
@@ -56,7 +56,7 @@ internal readonly ref struct ElfAccumulatorPt2
                 found1 = true; ;
             }
 
-            if (!found2 && value.Compare(Divider2) == Status.Continue)
+            if (!found2 && value.Is(Divider2))
             {
                 if (found1)
                 {
