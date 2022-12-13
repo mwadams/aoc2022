@@ -15,16 +15,15 @@ internal ref struct ElfAccumulatorPt2
         this.lines = lines;
     }
 
-    public int ProcessLines()
+    public readonly int ProcessLines()
     {
-        Span<Node> orderedLines = new Node[lines.Length + 2];
-        int written = BuildLines(this.lines, orderedLines);
-        orderedLines = orderedLines[..written];
-        orderedLines.Sort((lhs, rhs) => (int)lhs.Compare(rhs));
+        Span<Node> orderedLines = new Node[((lines.Length + 1) * 2 / 3) + 2];
+        BuildLines(this.lines, orderedLines);
+        orderedLines.Sort(static (lhs, rhs) => (int)lhs.Compare(rhs));
         return CalculateResult(orderedLines);
     }
 
-    private static int BuildLines(string[] lines, Span<Node> orderedLines)
+    private static void BuildLines(string[] lines, Span<Node> orderedLines)
     {
         int i = 0;
         orderedLines[i++] = Divider1;
@@ -37,8 +36,6 @@ internal ref struct ElfAccumulatorPt2
                 orderedLines[i++] = ParseArray(line).Value;
             }
         }
-
-        return i;
     }
 
     private static int CalculateResult(ReadOnlySpan<Node> orderedLines)
