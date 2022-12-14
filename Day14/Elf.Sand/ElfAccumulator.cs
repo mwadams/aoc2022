@@ -20,6 +20,7 @@ internal readonly ref struct ElfAccumulator
         Matrix matrix = new(minimum, maximum, matrixBuffer);
         DrawBuffer(segments, ref matrix);
         int result = RunSand(entry, ref matrix);
+        matrix.WriteToFile("pt1.txt", entry);
         return result;
     }
 

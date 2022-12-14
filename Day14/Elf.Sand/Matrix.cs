@@ -64,8 +64,10 @@
             buffer[CalculatePoint(x, y)] = value;
         }
 
-        public readonly void WriteToConsole()
+        public readonly void WriteToConsole(Point entry)
         {
+            int entryIndex = CalculatePoint(entry.X, entry.Y);
+
             for (int i = 0; i < buffer.Length; i++)
             {
                 if (i % width == 0)
@@ -73,14 +75,22 @@
                     Console.WriteLine();
                 }
 
-                Console.Write(this.buffer[i]);
+                if (i == entryIndex)
+                {
+                    Console.Write('+');
+                }
+                else
+                {
+                    Console.Write(this.buffer[i]);
+                }
             }
 
             Console.WriteLine();
         }
 
-        public readonly void WriteToFile(string filename)
+        public readonly void WriteToFile(string filename, Point entry)
         {
+            int entryIndex = CalculatePoint(entry.X, entry.Y);
             using var writer = File.CreateText(filename);
             for (int i = 0; i < buffer.Length; i++)
             {
@@ -89,7 +99,14 @@
                     writer.WriteLine();
                 }
 
-                writer.Write(this.buffer[i]);
+                if (i == entryIndex)
+                {
+                    writer.Write('+');
+                }
+                else
+                {
+                    writer.Write(this.buffer[i]);
+                }
             }
 
             writer.WriteLine();
