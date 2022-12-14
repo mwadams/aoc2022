@@ -47,7 +47,7 @@ static void ProcessElfFile(FileInfo file)
     int units2 = 0;
 
     // Warmup
-    for (int i = 0; i < Iterations; ++i)
+    for (int i = 0; i < Iterations / 100; ++i)
     {
         accumulator2 = new(lines);
         units2 = accumulator2.FindUnits(new Point(500, 0));
