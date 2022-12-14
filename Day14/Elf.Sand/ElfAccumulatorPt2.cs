@@ -159,7 +159,7 @@ internal readonly ref struct ElfAccumulatorPt2
     {
         Span<Point> segments = stackalloc Point[32];
 
-        int minX = minimum.X, minY = minimum.Y, maxX = maximum.X, maxY = maximum.Y;
+        int minX = minimum.X, maxX = maximum.X, maxY = maximum.Y;
 
         int segmentCount = 0;
         for (int i = 0; i < line.Length; ++i)
@@ -171,14 +171,13 @@ internal readonly ref struct ElfAccumulatorPt2
             }
             int consumed = ParsePoint(line[i..], out Point start);
             minX = Math.Min(minX, start.X);
-            minY = Math.Min(minY, start.Y);
             maxX = Math.Max(maxX, start.X);
             maxY = Math.Max(maxY, start.Y);
             segments[segmentCount++] = start;
             i += consumed;
         }
 
-        minimum = new Point(minX, minY);
+        minimum = new Point(minX, 0);
         maximum = new Point(maxX, maxY);
         return new Segment(segments[..segmentCount].ToArray());
     }
