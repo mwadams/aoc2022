@@ -29,6 +29,9 @@ public readonly struct Node
         this.value = null;
     }
 
+    internal List<Node> Children => this.children;
+    internal int? Value => this.value;
+
     private static Status CompareListifiedLeftToListRight(in Node lhs, in Node rhs)
     {
         if (rhs.children.Count == 0)
@@ -125,39 +128,6 @@ public readonly struct Node
         StringBuilder str = new();
         this.WriteTo(str);
         return str.ToString();
-    }
-
-    public bool Is(Node other)
-    {
-        if (this.value is int v)
-        {
-            if (other.value is int ov)
-            {
-                return v == ov;
-            }
-
-            return false;
-        }
-
-        if (other.value is int)
-        {
-            return false;
-        }
-
-        if (this.children.Count != other.children.Count)
-        {
-            return false;
-        }
-
-        for(int i = 0; i < this.children.Count; ++i)
-        {
-            if(!this.children[i].Is(other.children[i]))
-            {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private void WriteTo(StringBuilder str)

@@ -40,34 +40,35 @@ internal readonly ref struct ElfAccumulatorPt2
 
     private static int CalculateResult(ReadOnlySpan<Node> orderedLines)
     {
-        bool found1 = false;
-        bool found2 = false;
+        int found = 0;
         int result = 1;
         for (int i = 0; i < orderedLines.Length; ++i)
         {
             Node value = orderedLines[i];
-            if (!found1 && value.Is(Divider1))
+            if (IsDivider(value))
             {
-                if (found2)
+                if (found == 1)
                 {
                     return result * (i + 1);
                 }
                 result *= i + 1;
-                found1 = true; ;
-            }
-
-            if (!found2 && value.Is(Divider2))
-            {
-                if (found1)
-                {
-                    return result * (i + 1);
-                }
-                result *= i + 1;
-                found2 = true; ;
+                found++;
             }
         }
 
         throw new InvalidOperationException("Didn't find the boundary markers!");
+    }
+
+    private static bool IsDivider(Node value)
+    {
+        if (value.Children.Count == 1 &&
+            value.Children[0].Children.Count == 1)
+        {
+            int? marker = value.Children[0].Children[0].Value;
+            return marker is int m && (m == 6 || m == 2);
+        }
+
+        return false;
     }
 
     private static (Node Value, int Consumed) ParseArray(ReadOnlySpan<char> value)
