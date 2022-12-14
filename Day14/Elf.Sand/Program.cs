@@ -64,4 +64,6 @@ static void ProcessElfFile(FileInfo file)
     Console.WriteLine(units2);
     Console.WriteLine($"Pt2: {sw.ElapsedMilliseconds / (double)Iterations}ms");
 
+    ////ElfAccumulator accumulator = new(lines);
+    ////int units = accumulator.FindUnits(new Point(500, 0));
 }

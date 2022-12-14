@@ -57,17 +57,25 @@ internal readonly ref struct ElfAccumulator
     private static Result TryMove(ref Point current, ref Matrix matrix)
     {
         int x = current.X;
-        int y = current.Y + 1;
+        int y = current.Y;
 
-        if (!matrix.IsInBounds(x, y))
+        while (true)
         {
-            return Result.FlowedAway;
-        }
+            y++;
 
-        if (TestCandidate(ref matrix, x, y))
-        {
-            current = new(x, y);
-            return Result.Moving;
+            if (!matrix.IsInBoundsV(y))
+            {
+                return Result.FlowedAway;
+            }
+
+            if (TestCandidate(ref matrix, x, y))
+            {
+                current = new(x, y);
+            }
+            else
+            {
+                break;
+            }
         }
 
         x = x - 1;
