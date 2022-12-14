@@ -11,7 +11,7 @@ internal readonly ref struct ElfAccumulatorPt2
         this.lines = lines;
     }
 
-    public int FindUnits(Point entry)
+    public int FindUnits(in Point entry)
     {
         Span<Segment> segments = new Segment[this.lines.Length];
         BuildSegments(lines.AsSpan(), segments, entry, out Point minimum, out Point maximum);
@@ -26,7 +26,7 @@ internal readonly ref struct ElfAccumulatorPt2
         return result;
     }
 
-    private static void CalculateDimensionsAndUpdateMinMax(Point entry, ref Point minimum, ref Point maximum, out int width, out int height)
+    private static void CalculateDimensionsAndUpdateMinMax(in Point entry, ref Point minimum, ref Point maximum, out int width, out int height)
     {
         width = ((maximum.X - minimum.X) + 1);
         height = ((maximum.Y - minimum.Y) + 1);
@@ -140,7 +140,7 @@ internal readonly ref struct ElfAccumulatorPt2
         }
     }
 
-    private static void BuildSegments(ReadOnlySpan<string> lines, Span<Segment> segments, Point entry, out Point minimum, out Point maximum)
+    private static void BuildSegments(ReadOnlySpan<string> lines, Span<Segment> segments, in Point entry, out Point minimum, out Point maximum)
     {
         Point min = entry;
         Point max = entry;

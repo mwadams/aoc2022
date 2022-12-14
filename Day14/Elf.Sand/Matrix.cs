@@ -14,7 +14,7 @@
         private readonly int minBoundV;
         private readonly int floor;
 
-        public Matrix(Point minimum, Point maximum, Span<char> buffer)
+        public Matrix(in Point minimum, in Point maximum, Span<char> buffer)
         {
             this.buffer = buffer;
             this.buffer.Fill('.');
