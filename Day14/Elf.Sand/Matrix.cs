@@ -10,6 +10,9 @@
         private readonly int minY;
         private readonly int height;
         private readonly int width;
+        private readonly int minBoundH;
+        private readonly int minBoundV;
+        private readonly int floor;
 
         public Matrix(Point minimum, Point maximum, Span<char> buffer)
         {
@@ -19,6 +22,9 @@
             this.minY = minimum.Y;
             this.height = (maximum.Y - minimum.Y) + 1;
             this.width = (maximum.X - minimum.X) + 1;
+            this.minBoundH = this.minX + this.width;
+            this.minBoundV = this.minY + this.height;
+            this.floor = this.minY + this.height - 1;
         }
 
         public readonly bool IsInBounds(in Point p)
@@ -91,17 +97,17 @@
 
         public readonly bool IsOnFloor(int y)
         {
-            return (y - this.minY) == this.height - 1;
+            return y == this.floor;
         }
 
         public readonly bool IsInBoundsH(int p)
         {
-            return p >= this.minX && p < (this.minX + this.width);
+            return p >= this.minX && p < this.minBoundH;
         }
 
         public readonly bool IsInBoundsV(int p)
         {
-            return p >= this.minY && p < (this.minY + this.height);
+            return p >= this.minY && p < this.minBoundV;
         }
     }
 }
