@@ -26,7 +26,7 @@ internal readonly ref struct ElfAccumulator
     private static int RunSand(in Point entry, ref Matrix matrix)
     {
         int count = 0;
-        while(true)
+        while (true)
         {
             if (DropSand(entry, ref matrix))
             {
@@ -45,7 +45,7 @@ internal readonly ref struct ElfAccumulator
     {
         Result result = Result.Moving;
         Point current = entry;
-        while(result == Result.Moving)
+        while (result == Result.Moving)
         {
             result = TryMove(ref current, ref matrix);
         }
@@ -55,40 +55,41 @@ internal readonly ref struct ElfAccumulator
 
     private static Result TryMove(ref Point current, ref Matrix matrix)
     {
-        Point candidate = new(current.X, current.Y + 1);
+        int x = current.X;
+        int y = current.Y + 1;
 
-        if (!matrix.IsInBounds(candidate))
+        if (!matrix.IsInBounds(x, y))
         {
             return Result.FlowedAway;
         }
 
-        if (TestCandidate(ref matrix, candidate))
+        if (TestCandidate(ref matrix, x, y))
         {
-            current = candidate;
+            current = new(x, y);
             return Result.Moving;
         }
 
-        candidate = new(current.X - 1, current.Y + 1);
-        if (!matrix.IsInBounds(candidate))
+        x = x - 1;
+        if (!matrix.IsInBoundsH(x))
         {
             return Result.FlowedAway;
         }
 
-        if (TestCandidate(ref matrix, candidate))
+        if (TestCandidate(ref matrix, x, y))
         {
-            current = candidate;
+            current = new(x, y);
             return Result.Moving;
         }
 
-        candidate = new(current.X + 1, current.Y + 1);
-        if (!matrix.IsInBounds(candidate))
+        x = x + 2;
+        if (!matrix.IsInBoundsH(x))
         {
             return Result.FlowedAway;
         }
 
-        if (TestCandidate(ref matrix, candidate))
+        if (TestCandidate(ref matrix, x, y))
         {
-            current = candidate;
+            current = new(x, y);
             return Result.Moving;
         }
 
@@ -96,9 +97,9 @@ internal readonly ref struct ElfAccumulator
 
         return Result.Stopped;
 
-        static bool TestCandidate(ref Matrix matrix, in Point candidate)
+        static bool TestCandidate(ref Matrix matrix, int x, int y)
         {
-            return matrix.Get(candidate) == '.';
+            return matrix.Get(x, y) == '.';
         }
     }
 
@@ -150,7 +151,7 @@ internal readonly ref struct ElfAccumulator
     {
         Span<Point> segments = stackalloc Point[32];
 
-        int minX = minimum.X, minY = minimum.Y, maxX = maximum.X, maxY = maximum.Y;
+        int minX = minimum.X, maxX = maximum.X, maxY = maximum.Y;
 
         int segmentCount = 0;
         for (int i = 0; i < line.Length; ++i)
@@ -162,14 +163,13 @@ internal readonly ref struct ElfAccumulator
             }
             int consumed = ParsePoint(line[i..], out Point start);
             minX = Math.Min(minX, start.X);
-            minY = Math.Min(minY, start.Y);
             maxX = Math.Max(maxX, start.X);
             maxY = Math.Max(maxY, start.Y);
             segments[segmentCount++] = start;
             i += consumed;
         }
 
-        minimum = new Point(minX, minY);
+        minimum = new Point(minX, 0);
         maximum = new Point(maxX, maxY);
         return new Segment(segments[..segmentCount].ToArray());
     }
