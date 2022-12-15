@@ -16,8 +16,8 @@ public readonly ref struct ElfAccumulator
 
     private static int ProcessLines(string[] lines, int row)
     {
-        Span<SignalInfo> sensorPositions = stackalloc SignalInfo[lines.Length];
-        Span<Point> beaconPositions = stackalloc Point[lines.Length];
+        Span<SignalInfo> sensorPositionsBuffer = stackalloc SignalInfo[lines.Length];
+        Span<Point> beaconPositionsBuffer = stackalloc Point[lines.Length];
         int count = 0;
 
         int minX = int.MaxValue;
@@ -27,14 +27,23 @@ public readonly ref struct ElfAccumulator
         foreach (var line in lines)
         {
             ElfHelpers.ParseLine(line.AsSpan(), out Point sensor, out Point beacon);
-            minX = Math.Min(minX, sensor.X);
-            maxX = Math.Max(maxX, sensor.X);
             int delta = ElfHelpers.GetDelta(sensor, beacon);
             int deltaY = Math.Abs(sensor.Y - row);
+            if (deltaY > delta)
+            {
+                // Don't add the sensor if it is absolutely out of range
+                continue;
+            }
+
+            minX = Math.Min(minX, sensor.X);
+            maxX = Math.Max(maxX, sensor.X);
             maxDeltaX = Math.Max(Math.Max(0, delta - deltaY), maxDeltaX);
-            sensorPositions[count] = new(sensor, delta);
-            beaconPositions[count++] = beacon;
+            sensorPositionsBuffer[count] = new(sensor, delta);
+            beaconPositionsBuffer[count++] = beacon;
         }
+
+        ReadOnlySpan<SignalInfo> sensorPositions = sensorPositionsBuffer[..count];
+        ReadOnlySpan<Point> beaconPositions = beaconPositionsBuffer[..count];
 
         int result = 0;
 
