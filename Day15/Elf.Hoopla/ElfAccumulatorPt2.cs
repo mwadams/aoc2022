@@ -31,34 +31,38 @@ internal readonly ref struct ElfAccumulatorPt2
 
         foreach(var signalInfo in sensorPositions)
         {
+            // We are going to walk around all the points exactly one unit out of range of this sensor
             for(int deltaX = 0; deltaX <= signalInfo.Delta + 1; deltaX++)
             {
+                // This does the triangulation of the walk
+                // (if we went x across, there's this many "up" left (plus the 1 for the sensor itself)
                 int deltaY = signalInfo.Delta + 1 - deltaX;
 
+                // Walk out in each of the four directions in turn
                 int x = signalInfo.Sensor.X - deltaX;
                 int y = signalInfo.Sensor.Y - deltaY;
-                if (IsInBounds(x, y, range) && ElfHelpers.IsOutOfRange(x, y, sensorPositions))
+                if (PointIsInBoundsAndOutOfRangeOfAllSensors(range, sensorPositions, x, y))
                 {
                     return CalculateCode(x, y);
                 }
 
                 x = signalInfo.Sensor.X - deltaX;
                 y = signalInfo.Sensor.Y + deltaY;
-                if (IsInBounds(x, y, range) && ElfHelpers.IsOutOfRange(x, y, sensorPositions))
+                if (PointIsInBoundsAndOutOfRangeOfAllSensors(range, sensorPositions, x, y))
                 {
                     return CalculateCode(x, y);
                 }
 
                 x = signalInfo.Sensor.X + deltaX;
                 y = signalInfo.Sensor.Y - deltaY;
-                if (IsInBounds(x, y, range) && ElfHelpers.IsOutOfRange(x, y, sensorPositions))
+                if (PointIsInBoundsAndOutOfRangeOfAllSensors(range, sensorPositions, x, y))
                 {
                     return CalculateCode(x, y);
                 }
 
                 x = signalInfo.Sensor.X + deltaX;
                 y = signalInfo.Sensor.Y + deltaY;
-                if (IsInBounds(x, y, range) && ElfHelpers.IsOutOfRange(x, y, sensorPositions))
+                if (PointIsInBoundsAndOutOfRangeOfAllSensors(range, sensorPositions, x, y))
                 {
                     return CalculateCode(x, y);
                 }
@@ -68,13 +72,18 @@ internal readonly ref struct ElfAccumulatorPt2
         throw new InvalidOperationException();
     }
 
-    private static long CalculateCode(int x, int y)
+    private static bool PointIsInBoundsAndOutOfRangeOfAllSensors(int range, Span<SignalInfo> sensorPositions, int x, int y)
     {
-        return (x * (long)4_000_000) + y;
+        return IsInBounds(x, y, range) && ElfHelpers.IsOutOfRange(x, y, sensorPositions);
     }
 
     private static bool IsInBounds(int x, int y, int range)
     {
         return x >= 0 && y >= 0 && x <= range && y <= range;
+    }
+
+    private static long CalculateCode(int x, int y)
+    {
+        return (x * (long)4_000_000) + y;
     }
 }
