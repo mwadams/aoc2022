@@ -16,47 +16,53 @@ public readonly ref struct ElfAccumulator
 
     private static int ProcessLines(string[] lines, int row)
     {
-        Span<SignalInfo> sensorPositionsBuffer = stackalloc SignalInfo[lines.Length];
-        Span<Point> beaconPositionsBuffer = stackalloc Point[lines.Length];
-        int count = 0;
-
-        int minX = int.MaxValue;
-        int maxX = 0;
-        int maxDeltaX = 0;
-
+        Span<Range> rangesBuffer = stackalloc Range[lines.Length];
+        Span<int> beaconPositionsBuffer = stackalloc int[lines.Length];
+        int rangeCount = 0;
+        int beaconCount = 0;
         foreach (var line in lines)
         {
             ElfHelpers.ParseLine(line.AsSpan(), out Point sensor, out Point beacon);
             int delta = ElfHelpers.GetDelta(sensor, beacon);
             int deltaY = Math.Abs(sensor.Y - row);
-            if (deltaY > delta)
+            int deltaX = delta - deltaY;
+            if (beacon.Y == row)
+            {
+                if (!beaconPositionsBuffer.Contains(beacon.X))
+                {
+                    beaconPositionsBuffer[beaconCount++] = beacon.X;
+                }
+            }
+
+            if (deltaX < 0)
             {
                 // Don't add the sensor if it is absolutely out of range
                 continue;
             }
 
-            minX = Math.Min(minX, sensor.X);
-            maxX = Math.Max(maxX, sensor.X);
-            maxDeltaX = Math.Max(Math.Max(0, delta - deltaY), maxDeltaX);
-            sensorPositionsBuffer[count] = new(sensor, delta);
-            beaconPositionsBuffer[count++] = beacon;
+
+            rangesBuffer[rangeCount++] = new(sensor.X - deltaX, sensor.X + deltaX);
         }
 
-        ReadOnlySpan<SignalInfo> sensorPositions = sensorPositionsBuffer[..count];
-        ReadOnlySpan<Point> beaconPositions = beaconPositionsBuffer[..count];
+        Span<Range> ranges = rangesBuffer[..rangeCount];
+
+        ranges.Sort();
 
         int result = 0;
-
-        // The maximum range along the row is the max delta either side of the min and max x
-        for (int x = minX - maxDeltaX; x <= maxX + maxDeltaX; ++x)
+        int x = int.MinValue;
+        foreach (var range in ranges)
         {
-            // Is this out of range of all sensors, and not an existing beacon
-            if (!ElfHelpers.IsOutOfRange(x, row, sensorPositions) && !beaconPositions.Contains(new(x, row)))
+            x = Math.Max(x, range.Low);
+            if (range.High < x)
             {
-                result++;
+                continue;
             }
+
+            int high = range.High + 1;
+            result += high - x;
+            x = high;
         }
 
-        return result;
+        return result - beaconCount;
     }
 }
