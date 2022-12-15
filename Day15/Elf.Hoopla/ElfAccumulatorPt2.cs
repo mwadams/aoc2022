@@ -20,17 +20,11 @@ internal readonly ref struct ElfAccumulatorPt2
         Span<Point> beaconPositions = stackalloc Point[lines.Length];
         int count = 0;
 
-        int minX = int.MaxValue;
-        int maxX = 0;
-        int maxDelta = 0;
 
         foreach (var line in lines)
         {
             ParseLine(line.AsSpan(), out Point sensor, out Point beacon);
-            minX = Math.Min(beacon.X, Math.Min(minX, sensor.X));
-            maxX = Math.Max(beacon.X, Math.Max(maxX, sensor.X));
             int delta = Math.Abs(sensor.X - beacon.X) + Math.Abs(sensor.Y - beacon.Y);
-            maxDelta = Math.Max(delta, maxDelta);
             sensorPositions[count] = new(sensor, delta);
             beaconPositions[count++] = beacon;
         }
