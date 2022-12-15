@@ -27,8 +27,8 @@ internal readonly ref struct ElfAccumulator
         foreach (var line in lines)
         {
             ElfHelpers.ParseLine(line.AsSpan(), out Point sensor, out Point beacon);
-            minX = Math.Min(beacon.X, Math.Min(minX, sensor.X));
-            maxX = Math.Max(beacon.X, Math.Max(maxX, sensor.X));
+            minX = Math.Min(minX, sensor.X);
+            maxX = Math.Max(maxX, sensor.X);
             int delta = ElfHelpers.GetDelta(sensor, beacon);
             maxDelta = Math.Max(delta, maxDelta);
             sensorPositions[count] = new(sensor, delta);
