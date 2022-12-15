@@ -9,12 +9,12 @@ internal readonly ref struct ElfAccumulatorPt2
         this.lines = lines;
     }
 
-    public int Process(int row)
+    public long Process(int row)
     {
         return ProcessLines(this.lines, row);
     }
 
-    private static int ProcessLines(string[] lines, int range)
+    private static long ProcessLines(string[] lines, int range)
     {
         Span<SignalInfo> sensorPositions = stackalloc SignalInfo[lines.Length];
         Span<Point> beaconPositions = stackalloc Point[lines.Length];
@@ -33,7 +33,7 @@ internal readonly ref struct ElfAccumulatorPt2
         {
             for(int deltaX = 0; deltaX <= signalInfo.Delta + 1; deltaX++)
             {
-                int deltaY = (signalInfo.Delta + 1) - deltaX;
+                int deltaY = signalInfo.Delta + 1 - deltaX;
 
                 int x = signalInfo.Sensor.X - deltaX;
                 int y = signalInfo.Sensor.Y - deltaY;
@@ -68,9 +68,9 @@ internal readonly ref struct ElfAccumulatorPt2
         throw new InvalidOperationException();
     }
 
-    private static int CalculateCode(int x, int y)
+    private static long CalculateCode(int x, int y)
     {
-        return (x * 4_000_000) + y;
+        return (x * (long)4_000_000) + y;
     }
 
     private static bool IsInBounds(int x, int y, int range)
