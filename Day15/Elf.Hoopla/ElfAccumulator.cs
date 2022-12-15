@@ -31,7 +31,7 @@ public readonly ref struct ElfAccumulator
             maxX = Math.Max(maxX, sensor.X);
             int delta = ElfHelpers.GetDelta(sensor, beacon);
             int deltaY = Math.Abs(sensor.Y - row);
-            maxDeltaX = Math.Max(delta - deltaY, maxDeltaX);
+            maxDeltaX = Math.Max(Math.Max(0, delta - deltaY), maxDeltaX);
             sensorPositions[count] = new(sensor, delta);
             beaconPositions[count++] = beacon;
         }
