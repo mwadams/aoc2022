@@ -32,10 +32,16 @@ internal readonly ref struct ElfAccumulatorPt2
         foreach(var signalInfo in sensorPositions)
         {
             // We are going to walk around all the points exactly one unit out of range of this sensor
+            // That might be:
+            //    zero steps in the x direction
+            //    and the signal's full delta (plus 1 to to get out of range) in the y (either up or down)
+            // all the way through to
+            //   the signal's full delta (plus 1 to get out of range) in the x direction (either left or right)
+            //   and zero steps in the y direction.
             for(int deltaX = 0; deltaX <= signalInfo.Delta + 1; deltaX++)
             {
                 // This does the triangulation of the walk
-                // (if we went x across, there's this many "up" left (plus the 1 for the sensor itself)
+                // (if we went x across, there's this many "up/down" to go (plus the 1 to get out of range)
                 int deltaY = signalInfo.Delta + 1 - deltaX;
 
                 // Walk out in each of the four directions in turn
