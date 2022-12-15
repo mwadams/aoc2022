@@ -22,7 +22,7 @@ public readonly ref struct ElfAccumulator
 
         int minX = int.MaxValue;
         int maxX = 0;
-        int maxDelta = 0;
+        int maxDeltaX = 0;
 
         foreach (var line in lines)
         {
@@ -30,7 +30,8 @@ public readonly ref struct ElfAccumulator
             minX = Math.Min(minX, sensor.X);
             maxX = Math.Max(maxX, sensor.X);
             int delta = ElfHelpers.GetDelta(sensor, beacon);
-            maxDelta = Math.Max(delta, maxDelta);
+            int deltaY = Math.Abs(sensor.Y - row);
+            maxDeltaX = Math.Max(delta - deltaY, maxDeltaX);
             sensorPositions[count] = new(sensor, delta);
             beaconPositions[count++] = beacon;
         }
@@ -38,7 +39,7 @@ public readonly ref struct ElfAccumulator
         int result = 0;
 
         // The maximum range along the row is the max delta either side of the min and max x
-        for (int x = minX - maxDelta; x <= maxX + maxDelta; ++x)
+        for (int x = minX - maxDeltaX; x <= maxX + maxDeltaX; ++x)
         {
             // Is this out of range of all sensors, and not an existing beacon
             if (!ElfHelpers.IsOutOfRange(x, row, sensorPositions) && !beaconPositions.Contains(new(x, row)))
