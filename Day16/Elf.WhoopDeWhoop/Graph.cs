@@ -9,6 +9,8 @@ internal readonly ref struct Graph
     private readonly Dictionary<Node, int> flowRates = new();
     private readonly Dictionary<Node, int> flowNodeIndexes = new();
     private readonly Dictionary<PathKey, int> shortestPaths = new();
+    // Pre-allocate the working set
+    private readonly HashSet<VisitedKey> visited = new(200_000);
 
     public Graph(string[] lines)
     {
@@ -67,6 +69,7 @@ internal readonly ref struct Graph
 
     public T GraphSearch<T>(int minutes, Func<Item, T, T> onVisit, T initialValue)
     {
+        int maxStackSize = 0;
         Span<Node> allNodes = stackalloc Node[lines.Length];
         Span<Node> nodesWithFlowBuffer = stackalloc Node[lines.Length];
     
@@ -74,19 +77,22 @@ internal readonly ref struct Graph
 
         ReadOnlySpan<Node> nodesWithFlow = nodesWithFlowBuffer[..nodesWithFlowCount];
 
-        Stack<Item> stateStack = new();
-        stateStack.Push(new(Current: new('A', 'A'), RemainingTime: minutes, OpenedValves: 0, TotalFlow: 0));
+        int stackPointer = 0;
+        Span<Item> stateStack = stackalloc Item[1024];
 
-        HashSet<VisitedKey> visited = new();
+        stateStack[stackPointer++] = new(Current: new('A', 'A'), RemainingTime: minutes, OpenedValves: 0, TotalFlow: 0);
 
         T value = initialValue;
 
-        while (stateStack.Count > 0)
+        while (stackPointer > 0)
         {
-            Item item = stateStack.Pop()!;
+            stackPointer--;
+            Item item = stateStack[stackPointer];
 
             (long openedValves, int remainingTime, Node current, long totalFlow) = item;
 
+            // We need to uniquely visit a node, at a particular time, with a particular set of valves opened
+            // with a particular amount of preceding flow
             VisitedKey visitedKey = new(current, remainingTime, openedValves, totalFlow);
 
             if (visited.Contains(visitedKey))
@@ -103,18 +109,18 @@ internal readonly ref struct Graph
                 foreach (Node next in nodesWithFlow)
                 {
                     int nextIndex = flowNodeIndexes[next];
-                    if (!IsOpen(openedValves, nextIndex))
+                    if (!IsValveOpen(openedValves, nextIndex))
                     {
                         int nextRemaining = remainingTime - shortestPaths[new(current, next)] - 1;
 
                         if (nextRemaining > 0)
                         {
-                            stateStack.Push(
+                            stateStack[stackPointer++] =
                                 new(
                                     Current: next,
-                                    OpenedValves: AddOpen(openedValves, nextIndex),
+                                    OpenedValves: OpenValve(openedValves, nextIndex),
                                     RemainingTime: nextRemaining,
-                                    TotalFlow: totalFlow + nextRemaining * flowRates[next]));
+                                    TotalFlow: totalFlow + nextRemaining * flowRates[next]);
                         }
                     }
                 }
@@ -124,13 +130,13 @@ internal readonly ref struct Graph
         return value;
     }
 
-    private static long AddOpen(long current, int nodeIndex)
+    private static long OpenValve(long current, int nodeIndex)
     {
         long openMask = 1 << nodeIndex;
         return current | openMask;
     }
 
-    private static bool IsOpen(long current, int nodeIndex)
+    private static bool IsValveOpen(long current, int nodeIndex)
     {
         long openMask = 1 << nodeIndex;
         // Stupid "prettier" won't let me inline this code and puts bad parentheses!
