@@ -69,7 +69,6 @@ internal readonly ref struct Graph
 
     public T GraphSearch<T>(int minutes, Func<Item, T, T> onVisit, T initialValue)
     {
-        int maxStackSize = 0;
         Span<Node> allNodes = stackalloc Node[lines.Length];
         Span<Node> nodesWithFlowBuffer = stackalloc Node[lines.Length];
     
