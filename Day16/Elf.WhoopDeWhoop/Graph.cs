@@ -6,31 +6,29 @@ using System.Collections.Generic;
 internal readonly ref struct Graph
 {
     private readonly string[] lines;
+    private readonly Dictionary<Node, int> flowRates = new();
+    private readonly List<Node> allNodes = new();
+    private readonly List<Node> nodesWithFlow = new();
+    private readonly Dictionary<Node, int> flowNodeIndexes = new();
+    private readonly Dictionary<PathKey, int> shortestPaths = new();
 
     public Graph(string[] lines)
     {
         this.lines = lines;
     }
 
-    private static int BuildGraph(string[] lines,
-        Span<int> flowRates,
-        Span<Node> allNodes,
-        Span<Node> nodesWithFlowBuffer,
-        Dictionary<Node, int> flowNodeIndexes,
-        Dictionary<PathKey, int> shortestPaths)
+    private void BuildGraph()
     {
-        int nodeCount = 0;
-        int nodesWithFlowCount = 0;
         foreach (var line in lines)
         {
             Node from = ParseName(line);
             int flowRate = ParseFlowRate(line);
-            allNodes[nodeCount] = from;
-            flowRates[nodeCount++] = flowRate;
+            allNodes.Add(from);
+            flowRates[from] = flowRate;
             if (flowRate > 0)
             {
-                nodesWithFlowBuffer[nodesWithFlowCount] = from;
-                flowNodeIndexes[from] = nodesWithFlowCount++;
+                nodesWithFlow.Add(from);
+                flowNodeIndexes[from] = nodesWithFlow.Count;
             }
 
             // Set up Floyd-Warshall
@@ -59,20 +57,11 @@ internal readonly ref struct Graph
                 }
             }
         }
-
-        return nodesWithFlowCount;
     }
 
     public T GraphSearch<T>(int minutes, Func<Item, T, T> onVisit, T initialValue)
     {
-        Span<int> flowRates = stackalloc int[lines.Length];
-        Span<Node> allNodes = stackalloc Node[lines.Length];
-        Span<Node> nodesWithFlowBuffer = stackalloc Node[lines.Length];
-        Dictionary<Node, int> flowNodeIndexes = new();
-        Dictionary<PathKey, int> shortestPaths = new();
-
-        int flowNodeCount = BuildGraph(lines, flowRates, allNodes, nodesWithFlowBuffer, flowNodeIndexes, shortestPaths);
-        ReadOnlySpan<Node> nodesWithFlow = nodesWithFlowBuffer[..flowNodeCount];
+        BuildGraph();
 
         Stack<Item> stateStack = new();
         stateStack.Push(new(Current: new('A', 'A'), RemainingTime: minutes, OpenedValves: 0, TotalFlow: 0));
@@ -85,7 +74,9 @@ internal readonly ref struct Graph
         {
             Item item = stateStack.Pop()!;
 
-            VisitedKey visitedKey = new(item.Current, item.RemainingTime, item.OpenedValves, item.TotalFlow);
+            (long openedValves, int remainingTime, Node current, long totalFlow) = item;
+
+            VisitedKey visitedKey = new(current, remainingTime, openedValves, totalFlow);
 
             if (visited.Contains(visitedKey))
             {
@@ -96,23 +87,23 @@ internal readonly ref struct Graph
 
             value = onVisit(item, value);
 
-            if (item.RemainingTime != 0)
+            if (remainingTime != 0)
             {
                 foreach (Node next in nodesWithFlow)
                 {
                     int nextIndex = flowNodeIndexes[next];
-                    if (!IsOpen(item.OpenedValves, nextIndex))
+                    if (!IsOpen(openedValves, nextIndex))
                     {
-                        int nextRemaining = item.RemainingTime - shortestPaths[new(item.Current, next)] - 1;
+                        int nextRemaining = remainingTime - shortestPaths[new(current, next)] - 1;
 
                         if (nextRemaining > 0)
                         {
                             stateStack.Push(
                                 new(
                                     Current: next,
-                                    OpenedValves: AddOpen(item.OpenedValves, nextIndex),
+                                    OpenedValves: AddOpen(openedValves, nextIndex),
                                     RemainingTime: nextRemaining,
-                                    TotalFlow: item.TotalFlow + nextRemaining * flowRates[nextIndex]));
+                                    TotalFlow: totalFlow + nextRemaining * flowRates[next]));
                         }
                     }
                 }
