@@ -1,6 +1,6 @@
 ﻿namespace Elf.WhoopDeWhoop;
 
-internal ref partial struct ElfAccumulatorPt1
+public readonly ref struct ElfAccumulatorPt1
 {
     private readonly string[] lines;
 

@@ -77,7 +77,7 @@ internal readonly ref struct Graph
         ReadOnlySpan<Node> nodesWithFlow = nodesWithFlowBuffer[..nodesWithFlowCount];
 
         int stackPointer = 0;
-        Span<Item> stateStack = stackalloc Item[1024];
+        Span<Item> stateStack = stackalloc Item[1024]; // Max stack depth.
 
         stateStack[stackPointer++] = new(Current: new('A', 'A'), RemainingTime: minutes, OpenedValves: 0, TotalFlow: 0);
 
