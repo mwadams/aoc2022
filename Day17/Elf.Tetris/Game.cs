@@ -2,10 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    using static Elf.Tetris.Blocks;
 
     public static class Game
     {
@@ -24,7 +20,7 @@
 
             while (blocksToDrop > 0)
             {
-                Shape shape = (Blocks.Shape)((totalBlocks - blocksToDrop) % 5);
+                Blocks.Shape shape = (Blocks.Shape)((totalBlocks - blocksToDrop) % 5);
                 board.DropShape(2, shape);
                 blocksToDrop--;
                 dropped++;

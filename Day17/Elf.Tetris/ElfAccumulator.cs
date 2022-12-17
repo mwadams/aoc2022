@@ -1,7 +1,5 @@
 ﻿namespace Elf.Tetris;
 
-using static global::Elf.Tetris.Blocks;
-
 internal readonly ref struct ElfAccumulator
 {
     private readonly string[] lines;
