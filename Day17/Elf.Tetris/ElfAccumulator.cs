@@ -1,5 +1,7 @@
 ﻿namespace Elf.Tetris;
 
+using static global::Elf.Tetris.Blocks;
+
 internal readonly ref struct ElfAccumulator
 {
     private readonly string[] lines;
@@ -9,19 +11,8 @@ internal readonly ref struct ElfAccumulator
         this.lines = lines;
     }
 
-    public int Process()
-    {
-        int totalBlocks = 2022;
-        int blocksToDrop = totalBlocks;
-
-        Span<byte> playArea = stackalloc byte[blocksToDrop*4];
-        Board board = new(playArea, new Puffer(lines[0].AsSpan()));
-
-        while(blocksToDrop > 0)
-        {
-            board.DropShape(2, (Blocks.Shape)((totalBlocks - blocksToDrop) % 5));
-            blocksToDrop--;
-        }
-        return board.StackHeight;
+    public long Process()
+    {       
+        return Game.Process(lines[0].AsSpan(), 2022);
     }
 }

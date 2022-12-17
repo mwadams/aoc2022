@@ -10,17 +10,8 @@ internal readonly ref struct ElfAccumulatorPt2
         this.lines = lines;
     }
 
-    public int Process()
+    public long Process()
     {
-        foreach (var line in lines)
-        {
-            ProcessLine(line.AsSpan());
-        }
-
-        return 0;
-    }
-
-    private void ProcessLine(ReadOnlySpan<char> readOnlySpan)
-    {
+        return Game.Process(lines[0].AsSpan(), 1000000000000);
     }
 }

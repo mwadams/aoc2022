@@ -20,5 +20,7 @@
 
             return result;
         }
+
+        public int CurrentIndex => this.bufferIndex;
     }
 }

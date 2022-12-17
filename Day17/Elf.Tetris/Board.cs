@@ -18,6 +18,86 @@
             this.stackHeight = 0;
         }
 
+        public State GetState(Blocks.Shape shape)
+        {
+            bool found1 = false, found2 = false, found3 = false, found4 = false, found5 = false, found6 = false, found7 = false;
+            short col1 = 0, col2 = 0, col3 = 0, col4 = 0, col5 = 0, col6 = 0, col7 = 0;
+            for(int i = stackHeight - 1; i >= 0; --i)
+            {
+                if (found1 && found2 && found3 && found4 && found5 && found6 && found7)
+                {
+                    break;
+                }
+
+                byte row = this.playArea[i];
+
+                if (!found1 && (row & 0b10000000) == 0)
+                {
+                    col1++;
+                }
+                else
+                {
+                    found1 = true;
+                }
+
+                if (!found2 && (row & 0b01000000) == 0)
+                {
+                    col2++;
+                }
+                else
+                {
+                    found2 = true;
+                }
+
+                if (!found3 && (row & 0b00100000) == 0)
+                {
+                    col3++;
+                }
+                else
+                {
+                    found3 = true;
+                }
+
+                if (!found4 && (row & 0b00010000) == 0)
+                {
+                    col4++;
+                }
+                else
+                {
+                    found4 = true;
+                }
+
+                if (!found5 && (row & 0b00001000) == 0)
+                {
+                    col5++;
+                }
+                else
+                {
+                    found5 = true;
+                }
+
+                if (!found6 && (row & 0b00000100) != 0b00000100)
+                {
+                    col6++;
+                }
+                else
+                {
+                    found6 = true;
+                }
+
+                if (!found7 && (row & 0b00000010) != 0b00000010)
+                {
+                    col7++;
+                }
+                else
+                {
+                    found7 = true;
+                }
+            }
+
+            return new State(col1, col2, col3, col4, col5, col6, col7, shape, puffer.CurrentIndex);
+        }
+
         public void DropShape(int leftOffset, Blocks.Shape shape)
         {
             int currentLeftOffset = leftOffset;
@@ -34,6 +114,7 @@
             }
 
             this.StopBlock(block, currentLeftOffset, positionAboveBoard);
+
         }
 
         public void DrawBoard()
