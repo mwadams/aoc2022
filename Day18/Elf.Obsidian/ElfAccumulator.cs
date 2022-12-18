@@ -33,34 +33,22 @@ internal readonly ref struct ElfAccumulator
         }
 
         long result = 0;
-        int x = 0;
-        int y = 0;
-        int z = 0;
-
-
-        foreach (var facet in droplet)
+        for (int x = 0; x < maxDimension; x++)
         {
-
-            if ((facet & State.Exists) == 0)
+            for (int y = 0; y < maxDimension; y++)
             {
-                continue;
-            }
-
-            var faceState = facet & State.Faces;
-
-            EliminateFaces(ref faceState, x, y, z, droplet, maxDimension);
-
-            result += 6 - CountBits(faceState);
-
-            x += 1;
-            if (x > maxDimension)
-            {
-                x = 0;
-                y += 1;
-                if (y > maxDimension)
+                for (int z = 0; z < maxDimension; z++)
                 {
-                    y = 0;
-                    z += 1;
+                    var facet = droplet[x + (y * maxDimension) + (z * maxDimensionSquared)];
+                    if ((facet & State.Exists) == 0)
+                    {
+                        continue;
+                    }
+
+                    var faceState = facet & State.Faces;
+
+                    result += 6 - CountBits(faceState);
+
                 }
             }
         }
@@ -68,12 +56,7 @@ internal readonly ref struct ElfAccumulator
         return result;
     }
 
-    private void EliminateFaces(ref State faceState, int x, int y, int z, Span<State> droplet, int maxDimension)
-    {
-        // Run a search for a path to th
-    }
-
-    private int CountBits(State faceState)
+    private static int CountBits(State faceState)
     {
         return
             (((faceState & State.Face1) == 0) ? 0 : 1) +
