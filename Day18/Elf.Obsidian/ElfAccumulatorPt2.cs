@@ -17,6 +17,9 @@ internal readonly ref struct ElfAccumulatorPt2
         int maxDimensionSquared = maxDimension * maxDimension;
 
         Span<State> droplet = stackalloc State[maxDimension * maxDimension * maxDimension];
+        
+        // We will tell everything it is in a bubble to start with.
+        droplet.Fill(State.Bubble);
 
         Span<int> coordinates = stackalloc int[3];
 
@@ -79,23 +82,6 @@ internal readonly ref struct ElfAccumulatorPt2
 
     private static void FloodFill(Span<State> droplet, int maxDimension)
     {
-        for (int x = 1; x < maxDimension - 1; x++)
-        {
-            for (int y = 1; y < maxDimension - 1; y++)
-            {
-                for (int z = 1; z < maxDimension - 1; z++)
-                {
-                    ref State facet = ref droplet[x + (y * maxDimension) + (z * maxDimension * maxDimension)];
-
-                    if (facet == 0)
-                    {
-                        // Tell everything it is in a bubble
-                        facet |= State.Bubble;
-                    }
-                }
-            }
-        }
-
         bool changed = true;
         while (changed)
         {
