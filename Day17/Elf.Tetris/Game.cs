@@ -38,8 +38,13 @@
 
                         calculatedFromStats = repeats * heightDelta;
                         blocksToDrop = (int)(remainingItems % dropDelta);
-                        calculatingStats = false;
-                        state.Clear();
+                        foreach(var s in state)
+                        {
+                            if (s.Value.Item2 == blocksToDrop + heightDropped.Dropped)
+                            {
+                                return calculatedFromStats += s.Value.Item1 + heightDelta;
+                            }
+                        }
                     }
 
                     state.Add(currentState, (board.StackHeight, dropped));
