@@ -10,20 +10,26 @@ public readonly ref struct ElfAccumulatorPt2
 
     public long Process()
     {
-        int maxDimension = 30;
-        int maxDimensionSquared = maxDimension * maxDimension;
-
-        Span<State> droplet = stackalloc State[maxDimension * maxDimension * maxDimension];
-
         int coordinateCount = 0;
+        int maxDimension = 0;
         Span<int> coordinates = stackalloc int[3 * lines.Length];
 
         foreach (var line in lines)
         {
-            ProcessLine(line.AsSpan(), coordinates.Slice(coordinateCount, 3));
-
-            droplet[coordinates[coordinateCount] + (coordinates[coordinateCount + 1] * maxDimension) + (coordinates[coordinateCount + 2] * maxDimensionSquared)] = State.Exists;
+            Span<int> localCoordinates = coordinates.Slice(coordinateCount, 3);
+            ProcessLine(line.AsSpan(), localCoordinates);
+            maxDimension = Math.Max(localCoordinates[0], Math.Max(localCoordinates[1], Math.Max(localCoordinates[2], maxDimension)));
             coordinateCount += 3;
+        }
+
+        maxDimension += 2;
+        int maxDimensionSquared = maxDimension * maxDimension;
+
+        Span<State> droplet = stackalloc State[maxDimension * maxDimension * maxDimension];
+
+        for (int i = 0; i < coordinates.Length; i += 3)
+        {
+            droplet[coordinates[i] + (coordinates[i + 1] * maxDimension) + (coordinates[i + 2] * maxDimensionSquared)] = State.Exists;
         }
 
         FloodFill(droplet, maxDimension, maxDimensionSquared);
@@ -94,14 +100,14 @@ public readonly ref struct ElfAccumulatorPt2
                 {
                     for (int z = 1; z < maxDimension - 1; ++z)
                     {
-                        ref State facet = ref droplet[x + (y * maxDimension) + (z * maxDimension * maxDimension)];
+                        ref State facet = ref droplet[x + (y * maxDimension) + (z * maxDimensionSquared)];
                         if (facet == State.Bubble &&
-                            (droplet[x - 1 + (y * maxDimension) + (z * maxDimension * maxDimension)] == State.ConnectedToPerimeter ||
-                            droplet[x + 1 + (y * maxDimension) + (z * maxDimension * maxDimension)] == State.ConnectedToPerimeter ||
-                            droplet[x + ((y - 1) * maxDimension) + (z * maxDimension * maxDimension)] == State.ConnectedToPerimeter ||
-                            droplet[x + ((y + 1) * maxDimension) + (z * maxDimension * maxDimension)] == State.ConnectedToPerimeter ||
-                            droplet[x + (y * maxDimension) + ((z - 1) * maxDimension * maxDimension)] == State.ConnectedToPerimeter ||
-                            droplet[x + (y * maxDimension) + ((z + 1) * maxDimension * maxDimension)] == State.ConnectedToPerimeter))
+                            (droplet[x - 1 + (y * maxDimension) + (z * maxDimensionSquared)] == State.ConnectedToPerimeter ||
+                            droplet[x + 1 + (y * maxDimension) + (z * maxDimensionSquared)] == State.ConnectedToPerimeter ||
+                            droplet[x + ((y - 1) * maxDimension) + (z * maxDimensionSquared)] == State.ConnectedToPerimeter ||
+                            droplet[x + ((y + 1) * maxDimension) + (z * maxDimensionSquared)] == State.ConnectedToPerimeter ||
+                            droplet[x + (y * maxDimension) + ((z - 1) * maxDimensionSquared)] == State.ConnectedToPerimeter ||
+                            droplet[x + (y * maxDimension) + ((z + 1) * maxDimensionSquared)] == State.ConnectedToPerimeter))
                         {
                             changed = true;
                             facet = State.ConnectedToPerimeter;

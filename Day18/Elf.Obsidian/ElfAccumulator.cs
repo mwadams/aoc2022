@@ -10,20 +10,26 @@ public readonly ref struct ElfAccumulator
 
     public long Process()
     {
-        int maxDimension = 30;
-        int maxDimensionSquared = maxDimension * maxDimension;
-
-        Span<State> droplet = stackalloc State[maxDimension * maxDimension * maxDimension];
-
         int coordinateCount = 0;
+        int maxDimension = 0;
         Span<int> coordinates = stackalloc int[3 * lines.Length];
 
         foreach (var line in lines)
         {
-            ProcessLine(line.AsSpan(), coordinates.Slice(coordinateCount,3));
-
-            droplet[coordinates[coordinateCount] + (coordinates[coordinateCount + 1] * maxDimension) + (coordinates[coordinateCount + 2] * maxDimensionSquared)] = State.Exists;
+            Span<int> localCoordinates = coordinates.Slice(coordinateCount, 3);
+            ProcessLine(line.AsSpan(), localCoordinates);
+            maxDimension = Math.Max(localCoordinates[0], Math.Max(localCoordinates[1], Math.Max(localCoordinates[2], maxDimension)));
             coordinateCount += 3;
+        }
+
+        maxDimension += 2;
+        int maxDimensionSquared = maxDimension * maxDimension;
+
+        Span<State> droplet = stackalloc State[maxDimension * maxDimension * maxDimension];
+
+        for (int i = 0; i < coordinates.Length; i += 3)
+        {
+            droplet[coordinates[i] + (coordinates[i + 1] * maxDimension) + (coordinates[i + 2] * maxDimensionSquared)] = State.Exists;
         }
 
         long result = 0;
