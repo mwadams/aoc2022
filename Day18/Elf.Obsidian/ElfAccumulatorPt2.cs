@@ -1,7 +1,4 @@
 ﻿namespace Elf.Obsidian;
-
-using System.Collections.Generic;
-
 internal readonly ref struct ElfAccumulatorPt2
 {
     private readonly string[] lines;
@@ -18,66 +15,57 @@ internal readonly ref struct ElfAccumulatorPt2
 
         Span<State> droplet = stackalloc State[maxDimension * maxDimension * maxDimension];
 
-        Span<int> coordinates = stackalloc int[3];
+        int coordinateCount = 0;
+        Span<int> coordinates = stackalloc int[3 * lines.Length];
 
         foreach (var line in lines)
         {
-            ProcessLine(line.AsSpan(), coordinates);
+            ProcessLine(line.AsSpan(), coordinates.Slice(coordinateCount, 3));
 
-            droplet[coordinates[0] + (coordinates[1] * maxDimension) + (coordinates[2] * maxDimensionSquared)] = State.Exists;
+            droplet[coordinates[coordinateCount] + (coordinates[coordinateCount + 1] * maxDimension) + (coordinates[coordinateCount + 2] * maxDimensionSquared)] = State.Exists;
+            coordinateCount += 3;
         }
 
-        FloodFill(droplet, maxDimension);
+        FloodFill(droplet, maxDimension, maxDimensionSquared);
 
         long result = 0;
 
-
-        for (int x = 1; x < maxDimension - 1; x++)
+        for (int i = 0; i < coordinates.Length; i += 3)
         {
-            for (int y = 1; y < maxDimension - 1; y++)
+            int x = coordinates[i];
+            int y = coordinates[i + 1];
+            int z = coordinates[i + 2];
+
+            if (droplet[x - 1 + (y * maxDimension) + (z * maxDimensionSquared)] == State.ConnectedToPerimeter)
             {
-                for (int z = 1; z < maxDimension - 1; z++)
-                {
-                    var facet = droplet[x + (y * maxDimension) + (z * maxDimensionSquared)];
-
-                    if (facet != State.Exists)
-                    {
-                        continue;
-                    }
-
-                    if (droplet[x - 1 + (y * maxDimension) + (z * maxDimensionSquared)] == State.ConnectedToPerimeter)
-                    {
-                        result++;
-                    }
-                    if (droplet[x + 1 + (y * maxDimension) + (z * maxDimensionSquared)] == State.ConnectedToPerimeter)
-                    {
-                        result++;
-                    }
-                    if (droplet[x + ((y - 1) * maxDimension) + (z * maxDimensionSquared)] == State.ConnectedToPerimeter)
-                    {
-                        result++;
-                    }
-                    if (droplet[x + ((y + 1) * maxDimension) + (z * maxDimensionSquared)] == State.ConnectedToPerimeter)
-                    {
-                        result++;
-                    }
-                    if (droplet[x + (y * maxDimension) + ((z - 1) * maxDimensionSquared)] == State.ConnectedToPerimeter)
-                    {
-                        result++;
-                    }
-                    if (droplet[x + (y * maxDimension) + ((z + 1) * maxDimensionSquared)] == State.ConnectedToPerimeter)
-                    {
-                        result++;
-                    }
-                }
+                result++;
+            }
+            if (droplet[x + 1 + (y * maxDimension) + (z * maxDimensionSquared)] == State.ConnectedToPerimeter)
+            {
+                result++;
+            }
+            if (droplet[x + ((y - 1) * maxDimension) + (z * maxDimensionSquared)] == State.ConnectedToPerimeter)
+            {
+                result++;
+            }
+            if (droplet[x + ((y + 1) * maxDimension) + (z * maxDimensionSquared)] == State.ConnectedToPerimeter)
+            {
+                result++;
+            }
+            if (droplet[x + (y * maxDimension) + ((z - 1) * maxDimensionSquared)] == State.ConnectedToPerimeter)
+            {
+                result++;
+            }
+            if (droplet[x + (y * maxDimension) + ((z + 1) * maxDimensionSquared)] == State.ConnectedToPerimeter)
+            {
+                result++;
             }
         }
 
         return result;
     }
 
-
-    private static void FloodFill(Span<State> droplet, int maxDimension)
+    private static void FloodFill(Span<State> droplet, int maxDimension, int maxDimensionSquared)
     {
         for (int x = 1; x < maxDimension - 1; x++)
         {
@@ -85,9 +73,9 @@ internal readonly ref struct ElfAccumulatorPt2
             {
                 for (int z = 1; z < maxDimension - 1; z++)
                 {
-                    ref State facet = ref droplet[x + (y * maxDimension) + (z * maxDimension * maxDimension)];
+                    ref State facet = ref droplet[x + (y * maxDimension) + (z * maxDimensionSquared)];
 
-                    if (facet == 0)
+                    if (facet == State.ConnectedToPerimeter)
                     {
                         // Tell everything it is in a bubble
                         facet = State.Bubble;
