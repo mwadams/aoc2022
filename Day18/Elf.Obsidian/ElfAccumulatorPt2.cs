@@ -1,5 +1,5 @@
 ﻿namespace Elf.Obsidian;
-internal readonly ref struct ElfAccumulatorPt2
+public readonly ref struct ElfAccumulatorPt2
 {
     private readonly string[] lines;
 
