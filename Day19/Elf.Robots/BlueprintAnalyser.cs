@@ -50,7 +50,7 @@ public static class BlueprintAnalyser
             );
     }
 
-    private static RobotArmy BuildMaxRobots(Blueprint blueprint)
+    private static RobotArmy BuildMaxRobots(in Blueprint blueprint)
     {
         // You aren't going to need to build more robots than the maximum amount of ore you need to build the other robot types
         return new(
@@ -131,8 +131,8 @@ public static class BlueprintAnalyser
         // Then figure out which robot we built
         int newGeodeRobots = army.GeodeRobots + (robotTypeIndex == 3 ? 1 : 0);
         int newObsidianRobots = army.ObsidianRobots + (robotTypeIndex == 2 ? 1 : 0);
-        int newOreRobots = army.OreRobots + (robotTypeIndex == 0 ? 1 : 0);
         int newClayRobots = army.ClayRobots + (robotTypeIndex == 1 ? 1 : 0);
+        int newOreRobots = army.OreRobots + (robotTypeIndex == 0 ? 1 : 0);
 
         // That (along with the new current time we have stashed earlier) is the new state after this chunk of time elapsed
         newStore = new ResourceStore(newOre, newClay, newObsidian, newGeode);

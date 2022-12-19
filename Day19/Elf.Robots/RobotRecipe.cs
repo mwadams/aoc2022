@@ -6,5 +6,5 @@
 
     public readonly record struct RobotRecipe(int OreCost, int ClayCost, int ObsidianCost);
 
-    public readonly record struct Blueprint(RobotRecipe Ore, RobotRecipe Clay, RobotRecipe Obsidian, RobotRecipe Geode);
+    public readonly record struct Blueprint(in RobotRecipe Ore, in RobotRecipe Clay, in RobotRecipe Obsidian, in RobotRecipe Geode);
 }
