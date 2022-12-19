@@ -11,7 +11,7 @@
 
         public int StackHeight => this.stackHeight;
 
-        public Board(Span<byte> playArea, Puffer puffer)
+        public Board(Span<byte> playArea, in Puffer puffer)
         {
             this.playArea = playArea;
             this.puffer = puffer;
@@ -102,7 +102,7 @@
         {
             int currentLeftOffset = leftOffset;
             int positionAboveBoard = 3;
-            Span<byte[]> block = Blocks.GetShape(shape);
+            ReadOnlySpan<byte[]> block = Blocks.GetShape(shape);
 
             while (true)
             {
@@ -139,7 +139,7 @@
             Console.ReadLine();
         }
 
-        private void StopBlock(Span<byte[]> block, int leftOffset, int positionAboveBoard)
+        private void StopBlock(ReadOnlySpan<byte[]> block, int leftOffset, int positionAboveBoard)
         {
             int currentY = positionAboveBoard;
             int blockIndex = block.Length - 1;
@@ -162,7 +162,7 @@
             }
         }
 
-        private bool DropBlock(Span<byte[]> block, ref int leftOffset, ref int positionAboveBoard)
+        private bool DropBlock(ReadOnlySpan<byte[]> block, ref int leftOffset, ref int positionAboveBoard)
         {
             if (positionAboveBoard + stackHeight == 0)
             {

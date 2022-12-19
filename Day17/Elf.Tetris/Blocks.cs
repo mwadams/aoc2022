@@ -39,7 +39,7 @@
             new byte[] { 0b11000000, 0b01100000, 0b00110000, 0b00011000, 0b00001100, 0b00000110 },
         };
 
-        public static Span<byte[]> GetShape(Shape shape)
+        public static ReadOnlySpan<byte[]> GetShape(Shape shape)
         {
             return shape switch
             {
