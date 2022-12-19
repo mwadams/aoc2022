@@ -5,15 +5,15 @@
 
     public static class Game
     {
-        public static long Process(ReadOnlySpan<char> pufferCode, long totalBlocks)
+        public static long Process(ReadOnlySpan<char> pufferCode, long totalBlocks, bool useStats)
         {
             long blocksToDrop = totalBlocks;
 
             Span<byte> playArea = stackalloc byte[4500];
             Board board = new(playArea, new Puffer(pufferCode));
 
-            Dictionary<State, (int, int)> state = new();
-            bool calculatingStats = true;
+            Dictionary<State, (int, int)>? state = useStats ? new() : null;
+            bool calculatingStats = useStats;
             int dropped = 0;
 
             long calculatedFromStats = 0;

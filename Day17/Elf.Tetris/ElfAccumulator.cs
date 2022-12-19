@@ -11,6 +11,6 @@ public readonly ref struct ElfAccumulator
 
     public long Process()
     {       
-        return Game.Process(lines[0].AsSpan(), 2022);
+        return Game.Process(lines[0].AsSpan(), 2022, false);
     }
 }
