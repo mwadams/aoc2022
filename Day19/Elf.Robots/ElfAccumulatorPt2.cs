@@ -1,6 +1,4 @@
 ﻿namespace Elf.Robots;
-
-
 internal readonly ref struct ElfAccumulatorPt2
 {
     private readonly string[] lines;
@@ -12,15 +10,30 @@ internal readonly ref struct ElfAccumulatorPt2
 
     public long Process()
     {
+        Span<Blueprint> blueprints = stackalloc Blueprint[lines.Length];
+        int blueprintCount = 0;
         foreach (var line in lines)
         {
-            ProcessLine(line.AsSpan());
+            blueprints[blueprintCount++] = BlueprintAnalyser.BuildBlueprint(line.AsSpan());
         }
 
-        return 0;
+        return AnalyseBlueprints(blueprints);
     }
 
-    private void ProcessLine(ReadOnlySpan<char> readOnlySpan)
+    private static long AnalyseBlueprints(ReadOnlySpan<Blueprint> blueprints)
     {
+        // Only need the first 3 blueprints
+        blueprints = blueprints[..3];
+        long total = 1;
+        int blueprintIndex = 1;
+        foreach (var blueprint in blueprints)
+        {
+            long result = BlueprintAnalyser.AnalyseBlueprint(blueprint, 32);
+            total *= result;
+            blueprintIndex++;
+
+        }
+
+        return total;
     }
 }
