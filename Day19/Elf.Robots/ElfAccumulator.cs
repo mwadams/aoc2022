@@ -1,5 +1,6 @@
 ﻿namespace Elf.Robots;
-internal readonly ref struct ElfAccumulator
+
+public readonly ref struct ElfAccumulator
 {
     private readonly string[] lines;
 

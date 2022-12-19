@@ -5,6 +5,8 @@ VisualStudioVersion = 17.5.33103.201
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elf.Robots", "Elf.Robots.csproj", "{F2A89B48-5C23-433E-A2F6-579ACBD21442}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmark", "..\Benchmark\Benchmark.csproj", "{5015C1D9-08CB-498E-91B7-54FF7783C012}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{F2A89B48-5C23-433E-A2F6-579ACBD21442}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2A89B48-5C23-433E-A2F6-579ACBD21442}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2A89B48-5C23-433E-A2F6-579ACBD21442}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5015C1D9-08CB-498E-91B7-54FF7783C012}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5015C1D9-08CB-498E-91B7-54FF7783C012}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5015C1D9-08CB-498E-91B7-54FF7783C012}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5015C1D9-08CB-498E-91B7-54FF7783C012}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
