@@ -143,24 +143,22 @@ internal readonly ref struct ElfAccumulator
 
     private static int GetTargetFor(ref (int Value, int Index) item, int modVal)
     {
-        int amountToMove = item.Value % modVal;
+        int amountToMove = item.Value;
+        if (amountToMove < 0)
+        {
+            amountToMove = -amountToMove % modVal;
+            amountToMove = modVal - amountToMove;
+        }
+        else
+        {
+            amountToMove %= modVal;
+        }
 
         int target = item.Index + amountToMove;
-
-        if (target <= 0)
-        {
-            target += modVal;
-        }
 
         if (target >= modVal)
         {
             target -= modVal;
-        }
-
-        if (amountToMove < 0 && target == 0)
-        {
-            // Prefer the end (to correlate to the example output)
-            target = modVal;
         }
 
         return target;
