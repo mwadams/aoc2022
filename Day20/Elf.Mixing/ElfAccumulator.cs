@@ -26,7 +26,7 @@ public readonly ref struct ElfAccumulator
         {
             if (positions[i].Value == 0)
             {
-                indexOfZero = positions[i].Index;
+                indexOfZero = i;
                 break;
             }
         }
@@ -35,115 +35,84 @@ public readonly ref struct ElfAccumulator
         int index2000 = (2000 + indexOfZero) % positions.Length;
         int index3000 = (3000 + indexOfZero) % positions.Length;
 
-        FindValues(positions, index1000, index2000, index3000, out int val1000, out int val2000, out int val3000);
-
-        return val1000 + val2000 + val3000;
-    }
-
-    private static void FindValues(Span<(int Value, int Index)> positions, int index1000, int index2000, int index3000, out int val1000, out int val2000, out int val3000)
-    {
-        bool found1 = false;
-        bool found2 = false;
-        bool found3 = false;
-
-        val1000 = 0;
-        val2000 = 0;
-        val3000 = 0;
-
-
-        for (int i = 0; i < positions.Length; ++i)
-        {
-            if (!found1 && positions[i].Index == index1000)
-            {
-                found1 = true;
-                val1000 = positions[i].Value;
-                if (found2 && found3)
-                {
-                    return;
-                }
-            }
-
-            if (!found2 && positions[i].Index == index2000)
-            {
-                found2 = true;
-                val2000 = positions[i].Value;
-                if (found1 && found3)
-                {
-                    return;
-                }
-            }
-
-            if (!found3 && positions[i].Index == index3000)
-            {
-                found3 = true;
-                val3000 = positions[i].Value;
-                if (found1 && found2)
-                {
-                    return;
-                }
-            }
-        }
-
-        throw new InvalidOperationException();
+        return positions[index1000].Value  + positions[index2000].Value + positions[index3000].Value;
     }
 
     private static void Mix(Span<(int Value, int Index)> positions)
     {
         for (int i = 0; i < positions.Length; i++)
         {
-            if (positions[i].Value == 0)
-            {
-                Write(positions, "No change");
-                continue;
-            }
+            int currentIndex = FindOriginalItemIndex(positions, i);
+            int value = positions[currentIndex].Value;
 
-            int target = GetTargetFor(ref positions[i], positions.Length - 1);
-            if (positions[i].Index == target)
+            int targetIndex = GetTargetFor(currentIndex, value, positions.Length - 1);
+            if (currentIndex == targetIndex)
             {
                 // Nothing to do if it doesn't move.
-                Write(positions, "No change");
                 continue;
             }
 
-
-            for (int j = 0; j < positions.Length; ++j)
-            {
-                Update(ref positions[j], positions[i].Index, target);
-            }
-
-            positions[i] = (positions[i].Value, target);
-            Write(positions);
+            Move(positions, currentIndex, targetIndex);
         }
+    }
+
+    private static void Move(Span<(int Value, int Index)> positions, int from, int to)
+    {
+        (int, int) tmp = positions[from];
+        int length = from - to;
+
+        if (length > 0)
+        {
+            positions.Slice(to, length).CopyTo(positions.Slice(to + 1, length));
+        }
+        else if (length < 0)
+        {
+            positions.Slice(from + 1, -length).CopyTo(positions.Slice(from, -length));
+        }
+
+        positions[to] = tmp;
+    }
+
+    private static int FindOriginalItemIndex(Span<(int Value, int Index)> positions, int index)
+    {
+        for (int i = 0; i < positions.Length; ++i)
+        {
+            if (positions[i].Index == index)
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     private static void Write(Span<(int Value, int Index)> positions, string? append = null)
     {
-        //foreach (var item in positions)
-        //{
-        //    Console.CursorLeft = item.Index;
-        //    if (item.Value < 0)
-        //    {
-        //        Console.ForegroundColor = ConsoleColor.Red;
-        //    }
-        //    else
-        //    {
-        //        Console.ForegroundColor = ConsoleColor.Green;
-        //    }
+        foreach (var item in positions)
+        {
+            Console.CursorLeft = item.Index;
+            if (item.Value < 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+            }
 
-        //    Console.Write(Math.Abs(item.Value));
-        //}
-        //if (!string.IsNullOrEmpty(append))
-        //{
-        //    Console.Write(' ');
-        //    Console.Write(append);
-        //}
+            Console.Write(Math.Abs(item.Value));
+        }
+        if (!string.IsNullOrEmpty(append))
+        {
+            Console.Write(' ');
+            Console.Write(append);
+        }
 
-        //Console.ReadLine();
+        Console.ReadLine();
     }
 
-    private static int GetTargetFor(ref (int Value, int Index) item, int modVal)
+    private static int GetTargetFor(int index, int amountToMove, int modVal)
     {
-        int amountToMove = item.Value;
         if (amountToMove < 0)
         {
             amountToMove = -amountToMove % modVal;
@@ -154,7 +123,7 @@ public readonly ref struct ElfAccumulator
             amountToMove %= modVal;
         }
 
-        int target = item.Index + amountToMove;
+        int target = index + amountToMove;
 
         if (target >= modVal)
         {
@@ -162,24 +131,6 @@ public readonly ref struct ElfAccumulator
         }
 
         return target;
-    }
-
-    private static void Update(ref (int Value, int Index) item, int from, int to)
-    {
-        if (to > from)
-        {
-            if (item.Index <= to && item.Index > from)
-            {
-                item.Index -= 1;
-            }
-        }
-        else
-        {
-            if (item.Index < from && item.Index >= to)
-            {
-                item.Index += 1;
-            }
-        }
     }
 
     private static void ProcessLine(ReadOnlySpan<char> line, int index, Span<(int, int)> message)

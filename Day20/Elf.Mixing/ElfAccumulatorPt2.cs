@@ -11,129 +11,103 @@ public readonly ref struct ElfAccumulatorPt2
 
     public long Process()
     {
-        int decryptionKey = 811589153;
-        int index = 0;
+        const int decryptionKey = 811589153;
+        const int iterations = 10;
 
-        Span<(long Value, long Index)> positions = stackalloc (long, long)[lines.Length];
+        int index = 0;
+        Span<(long Value, int Index)> positions = stackalloc (long, int)[lines.Length];
         foreach (var line in lines)
         {
-            ProcessLine(line.AsSpan(), index++, positions);
+            ProcessLine(line.AsSpan(), index++, positions, decryptionKey);
         }
 
-        for (int i = 0; i < positions.Length; ++i)
-        {
-            positions[i].Value *= decryptionKey;
-        }
-
-        for (int i = 0; i < 10; ++i)
+        for(int i = 0; i < iterations; ++i)
         {
             Mix(positions);
         }
 
-        long indexOfZero = 0;
+        int indexOfZero = 0;
 
         for (int i = 0; i < positions.Length; ++i)
         {
             if (positions[i].Value == 0)
             {
-                indexOfZero = positions[i].Index;
+                indexOfZero = i;
                 break;
             }
         }
 
-        long index1000 = (1000 + indexOfZero) % positions.Length;
-        long index2000 = (2000 + indexOfZero) % positions.Length;
-        long index3000 = (3000 + indexOfZero) % positions.Length;
-        
-        FindValues(positions, index1000, index2000, index3000, out long val1000, out long val2000, out long val3000);
+        int index1000 = (1000 + indexOfZero) % positions.Length;
+        int index2000 = (2000 + indexOfZero) % positions.Length;
+        int index3000 = (3000 + indexOfZero) % positions.Length;
 
-        return (val1000 + val2000 + val3000);
+        return positions[index1000].Value + positions[index2000].Value + positions[index3000].Value;
     }
 
-    private static void FindValues(Span<(long Value, long Index)> positions, long index1000, long index2000, long index3000, out long val1000, out long val2000, out long val3000)
-    {
-        bool found1 = false;
-        bool found2 = false;
-        bool found3 = false;
-
-        val1000 = 0;
-        val2000 = 0;
-        val3000 = 0;
-
-
-        for (int i = 0; i < positions.Length; ++i)
-        {
-            if (!found1 && positions[i].Index == index1000)
-            {
-                found1 = true;
-                val1000 = positions[i].Value;
-                if (found2 && found3)
-                {
-                    return;
-                }
-            }
-
-            if (!found2 && positions[i].Index == index2000)
-            {
-                found2 = true;
-                val2000 = positions[i].Value;
-                if (found1 && found3)
-                {
-                    return;
-                }
-            }
-
-            if (!found3 && positions[i].Index == index3000)
-            {
-                found3 = true;
-                val3000 = positions[i].Value;
-                if (found1 && found2)
-                {
-                    return;
-                }
-            }
-        }
-
-        throw new InvalidOperationException();
-    }
-
-    private static void Mix(Span<(long Value, long Index)> positions)
+    private static void Mix(Span<(long Value, int Index)> positions)
     {
         for (int i = 0; i < positions.Length; i++)
         {
-            if (positions[i].Value == 0)
+            int currentIndex = FindOriginalItemIndex(positions, i);
+            long value = positions[currentIndex].Value;
+
+            int targetIndex = GetTargetFor(currentIndex, value, positions.Length - 1);
+            if (currentIndex == targetIndex)
             {
                 continue;
             }
 
-            long target = GetTargetFor(ref positions[i], positions.Length - 1);
-            if (positions[i].Index == target)
-            {
-                continue;
-            }
-
-
-            for (int j = 0; j < positions.Length; ++j)
-            {
-                Update(ref positions[j], positions[i].Index, target);
-            }
-
-            positions[i] = (positions[i].Value, target);
+            Move(positions, currentIndex, targetIndex);
         }
     }
 
-    private static void DumpToConsole(Span<(long Value, long Index)> positions)
+    private static void Move(Span<(long Value, int Index)> positions, int from, int to)
     {
-        Span<(long Value, long Index)> copy = stackalloc (long, long)[positions.Length];
-        positions.CopyTo(copy);
-        copy.Sort((l, r) => Math.Sign(l.Index - r.Index));
+        (long, int) tmp = positions[from];
+        int length = from - to;
 
-        foreach (var item in copy)
+        if (length > 0)
         {
+            positions.Slice(to, length).CopyTo(positions.Slice(to + 1, length));
+        }
+        else if (length < 0)
+        {
+            positions.Slice(from + 1, -length).CopyTo(positions.Slice(from, -length));
+        }
+
+        positions[to] = tmp;
+    }
+
+    private static int FindOriginalItemIndex(Span<(long Value, int Index)> positions, int index)
+    {
+        for (int i = 0; i < positions.Length; ++i)
+        {
+            if (positions[i].Index == index)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private static void Write(Span<(long Value, int Index)> positions)
+    {
+        bool first = true;
+        foreach (var item in positions)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                Console.Write(',');
+            }
+
             if (item.Value < 0)
             {
-                Console.ForegroundColor = ConsoleColor
-                    .Red;
+                Console.ForegroundColor = ConsoleColor.Red;
             }
             else
             {
@@ -141,15 +115,13 @@ public readonly ref struct ElfAccumulatorPt2
             }
 
             Console.Write(Math.Abs(item.Value));
-            Console.Write(',');
         }
 
         Console.ReadLine();
     }
 
-    private static long GetTargetFor(ref (long Value, long Index) item, long modVal)
+    private static int GetTargetFor(int index, long amountToMove, int modVal)
     {
-        long amountToMove = item.Value;
         if (amountToMove < 0)
         {
             amountToMove = -amountToMove % modVal;
@@ -160,17 +132,17 @@ public readonly ref struct ElfAccumulatorPt2
             amountToMove %= modVal;
         }
 
-        long target = item.Index + amountToMove;
+        long target = index + amountToMove;
 
         if (target >= modVal)
         {
             target -= modVal;
         }
 
-        return target;
+        return (int)target;
     }
 
-    private static void Update(ref (long Value, long Index) item, long from, long to)
+    private static void Update(ref (int Value, int Index) item, int from, int to)
     {
         if (to > from)
         {
@@ -188,8 +160,8 @@ public readonly ref struct ElfAccumulatorPt2
         }
     }
 
-    private static void ProcessLine(ReadOnlySpan<char> line, int index, Span<(long, long)> message)
+    private static void ProcessLine(ReadOnlySpan<char> line, int index, Span<(long, int)> message, long decryptionKey)
     {
-        message[index] = (long.Parse(line), index);
+        message[index] = (int.Parse(line) * decryptionKey, index);
     }
 }
