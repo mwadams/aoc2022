@@ -52,7 +52,7 @@ public static class BlueprintAnalyser
 
     private static RobotArmy BuildMaxRobots(in Blueprint blueprint)
     {
-        // You aren't going to need to build more robots than the maximum amount of ore you need to build the other robot types
+        // You aren't going to need to build more robots than the maximum amount of ore you need to build the most expensive other robot type in one turn
         return new(
             Math.Max(blueprint.Ore.OreCost, Math.Max(blueprint.Clay.OreCost, Math.Max(blueprint.Obsidian.OreCost, blueprint.Geode.OreCost))),
             Math.Max(blueprint.Obsidian.ClayCost, blueprint.Geode.ClayCost),
@@ -88,7 +88,7 @@ public static class BlueprintAnalyser
                 continue;
             }
 
-            // Build all the robots we can in this elapsed time, creating new resource and robot store state
+            // Build the robots we can in this elapsed time, creating new resource and robot store state
             // representing our situation after the amount of elaped time.
             BuildRobot(timeToMine, recipe, store, army, robotTypeIndex, out ResourceStore newStore, out RobotArmy newArmy);
 

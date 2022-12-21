@@ -142,24 +142,6 @@ public readonly ref struct ElfAccumulatorPt2
         return (int)target;
     }
 
-    private static void Update(ref (int Value, int Index) item, int from, int to)
-    {
-        if (to > from)
-        {
-            if (item.Index <= to && item.Index > from)
-            {
-                item.Index -= 1;
-            }
-        }
-        else
-        {
-            if (item.Index < from && item.Index >= to)
-            {
-                item.Index += 1;
-            }
-        }
-    }
-
     private static void ProcessLine(ReadOnlySpan<char> line, int index, Span<(long, int)> message, long decryptionKey)
     {
         message[index] = (int.Parse(line) * decryptionKey, index);
