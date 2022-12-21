@@ -11,41 +11,11 @@
         {
             Monkey r = root ?? throw new InvalidOperationException();
             Monkey h = humn ?? throw new InvalidOperationException();
+            
+            // This turns it into - for a target of zero
+            r.MakeSubtract(r.Left, r.Right);
 
-            long requiredTotal = 0;
-            while (r != humn)
-            {
-                if (r.LeftContainsHuman(h))
-                {
-                    long b = r.Right!.Shout();
-                    requiredTotal = r.GetExpectedFromRequiredAndRight(requiredTotal, b);
-                    if (r == root)
-                    {
-                        // Invert for the root to make our equality operation
-                        requiredTotal = -requiredTotal;
-                    }
-
-                    r = r.Left!;
-                }
-                else if (r.RightContainsHuman(h))
-                {
-                    long a = r.Left!.Shout();
-                    requiredTotal = r.GetExpectedFromRequiredAndLeft(requiredTotal, a);
-                    if (r == root)
-                    {
-                        // Invert for the root to make our equality operation
-                        requiredTotal = -requiredTotal;
-                    }
-
-                    r = r.Right!;
-                }
-                else
-                {
-                    throw new InvalidOperationException();
-                }
-            }
-
-            return requiredTotal;
+            return root.Tuohs(h, 0);
         }
     }
 }
