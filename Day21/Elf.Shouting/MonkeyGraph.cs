@@ -5,20 +5,12 @@
         private readonly Dictionary<string, Monkey> namedMonkeys = new();
         private Monkey? root;
 
-        public long Shout()
+        public long Process()
         {
-            Stack<Action> howlers = new();
-            root!.PrepareToShout(howlers);
-
-            while(howlers.Count > 0)
-            {
-                howlers.Pop()();
-            }
-
-            return root!.Number;
+            return root!.Shout();
         }
 
-        public void ProcessLine(ReadOnlySpan<char> line)
+        public void AddMonkey(ReadOnlySpan<char> line)
         {
             Monkey added;
             var name = line[..4].ToString();

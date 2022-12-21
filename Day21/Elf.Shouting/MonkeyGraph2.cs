@@ -8,7 +8,7 @@
         private Monkey? root;
         private Monkey? humn;
 
-        public long Shout()
+        public long Process()
         {
             Monkey r = root ?? throw new InvalidOperationException();
             Monkey h = humn ?? throw new InvalidOperationException();
@@ -18,8 +18,8 @@
             {
                 if (r.LeftContainsHuman(h))
                 {
-                    Shout(r.Right!);
-                    requiredTotal = r.GetExpectedFromRequired(requiredTotal);
+                    long b = r.Right!.Shout();
+                    requiredTotal = r.GetExpectedFromRequiredAndRight(requiredTotal, b);
                     if (r == root)
                     {
                         // Invert for the root to make our equality operation
@@ -30,8 +30,8 @@
                 }
                 else if (r.RightContainsHuman(h))
                 {
-                    Shout(r.Left!);
-                    requiredTotal = r.GetExpectedFromRequired(requiredTotal);
+                    long a = r.Left!.Shout();
+                    requiredTotal = r.GetExpectedFromRequiredAndLeft(requiredTotal, a);
                     if (r == root)
                     {
                         // Invert for the root to make our equality operation
@@ -49,20 +49,7 @@
             return requiredTotal;
         }
 
-        private static long Shout(Monkey monkey)
-        {
-            Stack<Action> howlers = new();
-            monkey.PrepareToShout(howlers);
-
-            while (howlers.Count > 0)
-            {
-                howlers.Pop()();
-            }
-
-            return monkey.Number;
-        }
-
-        public void ProcessLine(ReadOnlySpan<char> line)
+        public void AddMonkey(ReadOnlySpan<char> line)
         {
             Monkey added;
             var name = line[..4].ToString();

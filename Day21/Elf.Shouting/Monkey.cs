@@ -19,24 +19,17 @@
 
         public bool CanShout => number is long || (left is Monkey l && l.CanShout && right is Monkey r && r.CanShout);
 
-        public void PrepareToShout(Stack<Action> howlers)
+        public long Shout()
         {
-            if (CanShout)
+            Stack<Action> howlers = new();
+            this.PrepareToShout(howlers);
+
+            while (howlers.Count > 0)
             {
-                if (number is not long n)
-                {
-                    number = deferredScream!(this);
-                }
+                howlers.Pop()();
             }
-            else
-            {
-                howlers.Push(() => this.number = deferredScream!(this));
-                if (left is Monkey l && right is Monkey r)
-                {
-                    l.PrepareToShout(howlers);
-                    r.PrepareToShout(howlers);
-                }
-            }
+
+            return this.Number;
         }
 
         public void MakeAdd(Monkey left, Monkey right)
@@ -76,27 +69,17 @@
             this.number = number;
         }
 
-        internal bool LeftContainsHuman(Monkey? monkey)
+        public bool LeftContainsHuman(Monkey? monkey)
         {
             return this.leftContainsHuman ??= (this.left == monkey || (this.left is Monkey m && (m.LeftContainsHuman(monkey) || m.RightContainsHuman(monkey))));
         }
 
-        internal bool RightContainsHuman(Monkey? monkey)
+        public bool RightContainsHuman(Monkey? monkey)
         {
             return this.rightContainsHuman ??= (this.right == monkey || (this.right is Monkey m && (m.LeftContainsHuman(monkey) || m.RightContainsHuman(monkey))));
         }
 
-        internal long GetExpectedFromRequired(long requiredTotal)
-        {
-            if (this.rightContainsHuman is bool b && b)
-            {
-                return GetExpectedFromRequiredLeft(requiredTotal, left!.Number);
-            }
-
-            return GetExpectedFromRequiredRight(requiredTotal, right!.Number);
-        }
-
-        private long GetExpectedFromRequiredLeft(long requiredTotal, long number)
+        public long GetExpectedFromRequiredAndLeft(long requiredTotal, long number)
         {
             // Inverse operations
             return operation switch
@@ -109,7 +92,7 @@
             };
         }
 
-        private long GetExpectedFromRequiredRight(long requiredTotal, long number)
+        public long GetExpectedFromRequiredAndRight(long requiredTotal, long number)
         {
             // Inverse operations
             return operation switch
@@ -120,6 +103,26 @@
                 Operation.Division => number * requiredTotal,
                 _ => throw new NotSupportedException()
             };
+        }
+
+        private void PrepareToShout(Stack<Action> howlers)
+        {
+            if (CanShout)
+            {
+                if (number is not long n)
+                {
+                    number = deferredScream!(this);
+                }
+            }
+            else
+            {
+                howlers.Push(() => this.number = deferredScream!(this));
+                if (left is Monkey l && right is Monkey r)
+                {
+                    l.PrepareToShout(howlers);
+                    r.PrepareToShout(howlers);
+                }
+            }
         }
     }
 }

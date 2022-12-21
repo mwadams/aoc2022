@@ -14,9 +14,9 @@ public readonly ref struct ElfAccumulatorPt2
         MonkeyGraph2 graph = new();
         foreach (var line in lines)
         {
-            graph.ProcessLine(line.AsSpan());
+            graph.AddMonkey(line.AsSpan());
         }
 
-        return graph.Shout();
+        return graph.Process();
     }
 }

@@ -15,9 +15,9 @@ public readonly ref struct ElfAccumulator
 
         foreach (var line in lines)
         {
-            graph.ProcessLine(line.AsSpan());
+            graph.AddMonkey(line.AsSpan());
         }
 
-        return graph.Shout();
+        return graph.Process();
     }
 }
