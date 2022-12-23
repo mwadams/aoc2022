@@ -19,7 +19,7 @@ public readonly ref struct ElfAccumulator
         int groveWidth = grove[0].Length;
         int groveHeight = grove.Length;
 
-        HashSet<ElfPosition> elves = new(); ;
+        HashSet<ElfPosition> elves = new(groveWidth * groveHeight);
         BuildElfPositions(grove, groveWidth, groveHeight, elves);
 
         return DiffuseElves(elves, 10);
