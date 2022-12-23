@@ -9,17 +9,9 @@ public readonly ref struct ElfAccumulatorPt2
         this.lines = lines;
     }
 
-    public int Process()
+    public long Process()
     {
-        for (int i = 0; i < lines.Length; i++)
-        {
-            ProcessLine(lines, i);
-        }
-
-        return 0;
-    }
-
-    private void ProcessLine(ReadOnlySpan<string> lines, int index)
-    {
+        MonkeyWalk2.BuildMap(lines, out ReadOnlySpan<char> instructions, out int mapHeight, out int mapWidth);
+        return MonkeyWalk2.GoForAWalk(lines.AsSpan()[0..mapHeight], instructions, mapWidth, mapHeight);
     }
 }
