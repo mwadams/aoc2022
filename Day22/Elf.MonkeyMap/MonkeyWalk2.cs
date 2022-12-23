@@ -85,48 +85,11 @@ internal static class MonkeyWalk2
             }
             else
             {
-                walkIndex += ParseDistanceToWalk(instructions[walkIndex..], out int steps);
-                for (int j = 0; j < steps; j++)
+                walkIndex += ParseDistanceToWalk(instructions[walkIndex..], out int distanceToWalk);
+                for (int i = 0; i < distanceToWalk; i++)
                 {
                     var delta = MovementDeltas[direction];
-                    int newX = x + delta.X;
-                    int newY = y + delta.Y;
-                    int newDirection = direction;
-
-                    int newCubeX = (int)Math.Floor(newX / (double)cubeSize);
-                    int newCubeY = (int)Math.Floor(newY / (double)cubeSize);
-                    int movementIndex = MovementDeltas.IndexOf(new Delta(newCubeX - cellX, newCubeY - cellY));
-                    if (movementIndex != -1)
-                    {
-                        var connection = connections[face + (movementIndex * 7)];
-                        int faceIndex = cube.IndexOf(connection.Face);
-                        int cubeX = faceIndex % 4;
-                        int cubeY = faceIndex / 4;
-                        int transformedX = (newX + cubeSize) % cubeSize - cubeSize / 2;
-                        int transformedY = (newY + cubeSize) % cubeSize - cubeSize / 2;
-                        switch (connection.Rotation)
-                        {
-                            case 0:
-                                break;
-                            case 1:
-                                newDirection = (direction + 1) % 4;
-                                (transformedX, transformedY) = (-transformedY - 1, transformedX);
-                                break;
-                            case 2:
-                                newDirection = (direction + 2) % 4;
-                                (transformedX, transformedY) = (-transformedX - 1, -transformedY - 1);
-                                break;
-                            case 3:
-                                newDirection = (direction + 3) % 4;
-                                (transformedX, transformedY) = (transformedY, -transformedX - 1);
-                                break;
-                        }
-
-                        transformedX += cubeSize / 2;
-                        transformedY += cubeSize / 2;
-                        newX = (cubeX * cubeSize) + transformedX;
-                        newY = (cubeY * cubeSize) + transformedY;
-                    }
+                    HandleCubeEdges(cubeSize, cube, connections, x, y, direction, cellX, cellY, face, delta, out int newX, out int newY, out int newDirection);
 
                     if (map.GetPointOrBlank(newX, newY) != '#')
                     {
@@ -143,6 +106,47 @@ internal static class MonkeyWalk2
         }
 
         return (y + 1) * 1000 + (x + 1) * 4 + direction;
+    }
+
+    private static void HandleCubeEdges(int cubeSize, ReadOnlySpan<int> cube, ReadOnlySpan<Connection> connections, int x, int y, int direction, int cellX, int cellY, int face, Delta delta, out int newX, out int newY, out int newDirection)
+    {
+        newX = x + delta.X;
+        newY = y + delta.Y;
+        newDirection = direction;
+        int newCubeX = (int)Math.Floor(newX / (double)cubeSize);
+        int newCubeY = (int)Math.Floor(newY / (double)cubeSize);
+        int movementIndex = MovementDeltas.IndexOf(new Delta(newCubeX - cellX, newCubeY - cellY));
+        if (movementIndex != -1)
+        {
+            var connection = connections[face + (movementIndex * 7)];
+            int faceIndex = cube.IndexOf(connection.Face);
+            int cubeX = faceIndex % 4;
+            int cubeY = faceIndex / 4;
+            int transformedX = (newX + cubeSize) % cubeSize - cubeSize / 2;
+            int transformedY = (newY + cubeSize) % cubeSize - cubeSize / 2;
+            switch (connection.Rotation)
+            {
+                case 0:
+                    break;
+                case 1:
+                    newDirection = (direction + 1) % 4;
+                    (transformedX, transformedY) = (-transformedY - 1, transformedX);
+                    break;
+                case 2:
+                    newDirection = (direction + 2) % 4;
+                    (transformedX, transformedY) = (-transformedX - 1, -transformedY - 1);
+                    break;
+                case 3:
+                    newDirection = (direction + 3) % 4;
+                    (transformedX, transformedY) = (transformedY, -transformedX - 1);
+                    break;
+            }
+
+            transformedX += cubeSize / 2;
+            transformedY += cubeSize / 2;
+            newX = (cubeX * cubeSize) + transformedX;
+            newY = (cubeY * cubeSize) + transformedY;
+        }
     }
 
     private static void BuildConnections(ReadOnlySpan<int> cube, Span<Connection> connections)
