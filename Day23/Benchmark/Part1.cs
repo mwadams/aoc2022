@@ -24,10 +24,17 @@ public class Part1
         Console.WriteLine($"Pt1: {this.result}");
     }
 
-    [Benchmark]
+    [Benchmark(Baseline = true)]
     public void RunPart1()
     {
         ElfAccumulator accumulator = new(lines);
+        this.result = accumulator.Process();
+    }
+
+    [Benchmark]
+    public void RunPart1B()
+    {
+        ElfAccumulatorB accumulator = new(lines);
         this.result = accumulator.Process();
     }
 }

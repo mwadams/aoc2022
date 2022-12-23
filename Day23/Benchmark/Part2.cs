@@ -22,10 +22,17 @@ public class Part2
     }
 
 
-    [Benchmark]
+    [Benchmark(Baseline = true)]
     public void RunPart2()
     {
         ElfAccumulatorPt2 accumulator = new(lines);
+        this.result = accumulator.Process();
+    }
+
+    [Benchmark]
+    public void RunPart2B()
+    {
+        ElfAccumulatorPt2B accumulator = new(lines);
         this.result = accumulator.Process();
     }
 }
