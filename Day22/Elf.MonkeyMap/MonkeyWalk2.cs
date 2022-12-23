@@ -193,9 +193,9 @@ internal static class MonkeyWalk2
 
                         bool foundTarget = false;
 
-                        for (int s = 0; s < 4; s++)
+                        for (int side = 0; side < 4; side++)
                         {
-                            if (connections[faceIndex + (s * 7)].Face == target.Face)
+                            if (connections[faceIndex + (side * 7)].Face == target.Face)
                             {
                                 foundTarget = true;
                                 break;
@@ -232,7 +232,7 @@ internal static class MonkeyWalk2
         }
     }
 
-    // It returns the lenght of the integer string
+    // It returns the length of the integer string to advance the counter
     private static int ParseDistanceToWalk(ReadOnlySpan<char> instructionFragment, out int distanceToWalk)
     {
         int i = 0;
