@@ -1,7 +1,5 @@
 ﻿namespace Elf.Dodgems;
 
-using System.Drawing;
-
 public readonly ref struct ElfAccumulator
 {
     private static readonly Delta[] DirectionDeltas = new Delta[]
