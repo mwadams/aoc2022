@@ -1,7 +1,6 @@
 ﻿namespace Elf.Fuel;
 
 using System;
-using System.Text;
 
 internal static class NumberSystem
 {
