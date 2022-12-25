@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33103.201
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elf.Fuel", "Elf.Fuel.csproj", "{24789433-CDD5-466C-A7C2-4625E90A15E1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{24789433-CDD5-466C-A7C2-4625E90A15E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24789433-CDD5-466C-A7C2-4625E90A15E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24789433-CDD5-466C-A7C2-4625E90A15E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24789433-CDD5-466C-A7C2-4625E90A15E1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C23004BD-DEC6-4FC1-93F3-9C6A1CFA0ACB}
+	EndGlobalSection
+EndGlobal
