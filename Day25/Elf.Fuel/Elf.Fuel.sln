@@ -5,6 +5,8 @@ VisualStudioVersion = 17.5.33103.201
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elf.Fuel", "Elf.Fuel.csproj", "{24789433-CDD5-466C-A7C2-4625E90A15E1}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmark", "..\Benchmark\Benchmark.csproj", "{4F6B9015-73AA-43F1-A637-FCC84C6ACE6F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{24789433-CDD5-466C-A7C2-4625E90A15E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24789433-CDD5-466C-A7C2-4625E90A15E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24789433-CDD5-466C-A7C2-4625E90A15E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F6B9015-73AA-43F1-A637-FCC84C6ACE6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F6B9015-73AA-43F1-A637-FCC84C6ACE6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F6B9015-73AA-43F1-A637-FCC84C6ACE6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F6B9015-73AA-43F1-A637-FCC84C6ACE6F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

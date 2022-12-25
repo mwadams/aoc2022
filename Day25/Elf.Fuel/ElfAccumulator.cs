@@ -1,6 +1,6 @@
 ﻿namespace Elf.Fuel;
 
-internal readonly ref struct ElfAccumulator
+public readonly ref struct ElfAccumulator
 {
     private readonly string[] lines;
 

@@ -33,6 +33,11 @@ internal static class NumberSystem
 
     public static string BuildSnafu(long number)
     {
+        if (number == 0)
+        {
+            return "0";
+        }
+
         int characterIndex = 0;
         Span<char> characters = stackalloc char[256];
         while(number > 0)
