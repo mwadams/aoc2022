@@ -138,7 +138,6 @@ internal readonly ref struct Graph
     private static bool IsValveOpen(long current, int nodeIndex)
     {
         long openMask = 1 << nodeIndex;
-        // Stupid "prettier" won't let me inline this code and puts bad parentheses!
         long isOpenNum = current & openMask;
         return isOpenNum > 0;
     }
